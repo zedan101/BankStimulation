@@ -114,8 +114,16 @@ namespace BankStimulation
                                 int amount;
                                 if (int.TryParse(amtInput, out amount))
                                 {
-                                    accHolderService.DepositeFund(Convert.ToDouble(amount));
-                                    break;
+                                    if (accHolderService.DepositeFund(Convert.ToDouble(amount)))
+                                    {
+                                        Console.WriteLine("Deposite Successful");
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("Unsuccessful");
+                                        break;
+                                    }
                                 }
                                 else
                                 {
@@ -128,8 +136,16 @@ namespace BankStimulation
                                 amtInput = Console.ReadLine();
                                 if (int.TryParse(amtInput, out amount))
                                 {
-                                    accHolderService.WithdrawFund(amount);
-                                    break;
+                                    if (accHolderService.WithdrawFund(amount))
+                                    {
+                                        Console.WriteLine("Withdraw Successful");
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("Unsuccessful");
+                                        break;
+                                    }
                                 }
                                 else
                                 {
