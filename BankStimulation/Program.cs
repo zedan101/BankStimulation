@@ -1,9 +1,10 @@
 ﻿using BankStimulation.Services;
 using BankStimulation.Model;
+using System.Security.AccessControl;
 
 namespace BankStimulation
 {
-    internal class Program
+    public class Program
     {
         enum MenuAccHolder
         {
@@ -18,67 +19,76 @@ namespace BankStimulation
         {
             AccountHolderService accHolderService = new AccountHolderService();
             BankEmployeeService bankEmployeeService = new BankEmployeeService();
+            BankingService bankingService = new BankingService();
             Console.WriteLine("Bank Stimulation");
             bool exit = false;
             do
             {
                 Console.WriteLine("For Bank Employee LogIn Enter 0");
                 Console.WriteLine("For Account Holder LogIn Enter 1");
-                int userInput = Int32.Parse(Console.ReadLine());
-                if (userInput == 0)
+                string input =Console.ReadLine();
+                int userInput;
+                if(int.TryParse(input,out userInput))
                 {
-                    Console.WriteLine("Enter Employee Id");
-                    string empId = Console.ReadLine();
-                    if (bankEmployeeService.ValidateEmpId(empId))
+                    if (userInput == 0)
                     {
-                        Console.WriteLine("Enter Password");
-                        string empPass = Console.ReadLine();
-                        if (bankEmployeeService.ValidateEmpPass(empPass))
+                        Console.WriteLine("Enter Employee Id");
+                        string empId = Console.ReadLine();
+                        if (bankEmployeeService.ValidateEmpId(empId))
                         {
-                            UiBankEmployee();
+                            Console.WriteLine("Enter Password");
+                            string empPass = Console.ReadLine();
+                            if (bankEmployeeService.ValidateEmpPass(empPass))
+                            {
+                                UiBankEmployee();
+                            }
+                            else
+                            {
+                                Console.WriteLine("Invalid Password");
+                            }
                         }
                         else
                         {
-                            Console.WriteLine("Invalid Password");
+                            Console.WriteLine("Invalid Id");
                         }
-                    }
-                    else
-                    {
-                        Console.WriteLine("Invalid Id");
-                    }
 
-                }
-                else if (userInput == 1)
-                {
-                    Console.WriteLine("Enter Employee Id");
-                    string accNum = Console.ReadLine();
-                    if (accHolderService.ValidateAccNum(accNum))
+                    }
+                    else if (userInput == 1)
                     {
-                        Console.WriteLine("Enter Password");
-                        string accPin = Console.ReadLine();
-                        if (accHolderService.ValidateAccPin(accPin))
+                        Console.WriteLine("Enter Employee Id");
+                        string accNum = Console.ReadLine();
+                        if (accHolderService.ValidateAccNum(accNum))
                         {
-                            UiAccountHolder();
+                            Console.WriteLine("Enter Password");
+                            string accPin = Console.ReadLine();
+                            if (accHolderService.ValidateAccPin(accPin))
+                            {
+                                UiAccountHolder();
+                            }
+                            else
+                            {
+                                Console.WriteLine("Invalid Password");
+                            }
                         }
                         else
                         {
-                            Console.WriteLine("Invalid Password");
+                            Console.WriteLine("Invalid Id");
                         }
+                    }
+                    else if (userInput == 0)
+                    {
+                        exit = true;
                     }
                     else
                     {
-                        Console.WriteLine("Invalid Id");
+                        Console.WriteLine("Invalid Input");
                     }
-                }
-                else if(userInput == 0)
-                {
-                    exit=true;
+                    Console.WriteLine("\n =========||||||||========== \n");
                 }
                 else
                 {
                     Console.WriteLine("Invalid Input");
                 }
-                Console.WriteLine("\n =========||||||||========== \n");
             }
             while (!exit);
 
@@ -92,60 +102,112 @@ namespace BankStimulation
                     Console.WriteLine("To Transact Money Enter 3");
                     Console.WriteLine("To View Transaction history Enter 4");
                     Console.WriteLine("To Exit Enter 0");
-                    int userInput = Int32.Parse(Console.ReadLine());
-                    switch ((MenuAccHolder)userInput)
+                    string input = Console.ReadLine();
+                    int userInput;
+                    if(int.TryParse(input, out userInput))
                     {
-                        case MenuAccHolder.DepositeMoney:
-                            Console.WriteLine("\n Please enter the Amount");
-                            double amount = Convert.ToDouble(Console.ReadLine());
-                            accHolderService.DepositeFund(amount);
-                            break;
+                        switch ((MenuAccHolder)userInput)
+                        {
+                            case MenuAccHolder.DepositeMoney:
+                                Console.WriteLine("\n Please enter the Amount");
+                                string amtInput = Console.ReadLine();
+                                int amount;
+                                if (int.TryParse(amtInput, out amount))
+                                {
+                                    accHolderService.DepositeFund(Convert.ToDouble(amount));
+                                    break;
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Invalid Input");
+                                    break;
+                                }
 
-                        case MenuAccHolder.WithdrawMoney:
-                            Console.WriteLine("\n Please enter amount to Withdraw");
-                            amount = Convert.ToDouble(Console.ReadLine());
-                            accHolderService.WithdrawFund(amount);
-                            break;
+                            case MenuAccHolder.WithdrawMoney:
+                                Console.WriteLine("\n Please enter amount to Withdraw");
+                                amtInput = Console.ReadLine();
+                                if (int.TryParse(amtInput, out amount))
+                                {
+                                    accHolderService.WithdrawFund(amount);
+                                    break;
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Invalid Input");
+                                    break;
+                                }
 
-                        case MenuAccHolder.transactMoney:
-                            Console.WriteLine("Enter reciever Bank Id");
-                            string rcvBankId = Console.ReadLine();
-                            Console.WriteLine("Enter Reciever bank Account Number");
-                            string rcvAccNum = Console.ReadLine();
-                            Console.WriteLine("Enter Amiount To tranfer");
-                            amount = Convert.ToDouble(Console.ReadLine());
-                            Console.WriteLine("Enter Transfet Type |t For RTGS->1 \t For IMPS->2 ");
-                            userInput = Int32.Parse(Console.ReadLine());
-                            if (userInput == 1)
-                            {
-                                accHolderService.TransferFundsRtgs(amount, rcvAccNum, rcvBankId);
+                            case MenuAccHolder.transactMoney:
+                                Console.WriteLine("Enter reciever Bank Id");
+                                string rcvBankId = Console.ReadLine();
+                                Console.WriteLine("Enter Reciever bank Account Number");
+                                string rcvAccNum = Console.ReadLine();
+                                Console.WriteLine("Enter Amiount To tranfer");
+                                amtInput = Console.ReadLine();
+                                if (int.TryParse(amtInput, out amount))
+                                {
+                                    Console.WriteLine("Enter Transfet Type \t For RTGS->1 \t For IMPS->2 ");
+                                    input = Console.ReadLine();
+                                    if (int.TryParse(input, out userInput))
+                                    {
+                                        if (userInput == 1)
+                                        {
+                                            accHolderService.TransferFundsRtgs(amount, rcvAccNum, rcvBankId);
+                                            break;
+                                        }
+                                        else if (userInput == 2)
+                                        {
+                                            accHolderService.TransferFundImps(amount, rcvAccNum, rcvBankId);
+                                            break;
+                                        }
+                                        else
+                                        {
+                                            Console.WriteLine("Please Enter Valid Option");
+                                            break;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("Invalid Input");
+                                        break;
+                                    }
+
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Invalid Input");
+                                    break;
+                                }
+
+
+                            case MenuAccHolder.transactionHistory:
+                                if (accHolderService.ViewTransectionHistory().Any())
+                                {
+                                    foreach (Transactions item in accHolderService.ViewTransectionHistory())
+                                    {
+                                        Console.WriteLine("Transaction Number:-" + item.transectionNum);
+                                        Console.WriteLine("Transaction Amount:-" + item.transactionAmount);
+                                        Console.WriteLine("Recievers Account Number:-" + item.recieversAccNum);
+                                        Console.WriteLine("Recievers Bank Id:-" + item.sendersBankId);
+                                    }
+                                    break;
+                                }
+                                else
+                                {
+                                    Console.WriteLine("No Transactions Yet");
+                                    break;
+                                }
+                                
+
+                            case MenuAccHolder.Exit:
+                                exit = true;
                                 break;
-                            }
-                            else if (userInput == 2)
-                            {
-                                accHolderService.TransferFundImps(amount, rcvAccNum, rcvBankId);
-                                break;
-                            }
-                            else
-                            {
-                                Console.WriteLine("Please Enter Valid Option");
-                                break;
-                            }
 
-                        case MenuAccHolder.transactionHistory:
-                            foreach (Transactions item in accHolderService.ViewTransectionHistory())
-                            {
-                                Console.WriteLine("Transaction Number:-" + item.transectionNum);
-                                Console.WriteLine("Transaction Amount:-" + item.transactionAmount);
-                                Console.WriteLine("Recievers Account Number:-" + item.recieversAccNum);
-                                Console.WriteLine("Recievers Bank Id:-" + item.sendersBankId);
-                            }
-                            break;
-
-                        case MenuAccHolder.Exit:
-                            exit=true;
-                            break;
-
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("Invalid Input");
                     }
                 }
                 while (!exit);
@@ -164,81 +226,194 @@ namespace BankStimulation
                     Console.WriteLine("To Revert A Transaction Enter 7");
                     Console.WriteLine("To Display Account Details Enter 8");
                     Console.WriteLine("To Exit Enter 0");
-                    int userInput = Int32.Parse(Console.ReadLine());
-                    switch((MenuBankEmp)userInput)
+                    string input = Console.ReadLine();
+                    int userInput;
+                    if (int.TryParse(input, out userInput))
                     {
-                        case MenuBankEmp.CreateNewAcc:
-                            Console.WriteLine("Enter Account Holder Name");
-                            string accHldrName = Console.ReadLine();
-                            Console.WriteLine("Enter Initial Account balance");
-                            double amount = Convert.ToDouble(Console.ReadLine());
-                            Console.WriteLine("Enter Pin");
-                            string accPin = Console.ReadLine();
-                            bankEmployeeService.CreatNewAccount(new AccountHolder() {accHolderName = accHldrName, 
-                            accNumber = accHldrName.Substring(0,3) + DateTime.Now.ToString("ddMMyyyy") , 
-                            AccountBalance=amount , AccPin=accPin});
-                            break;
+                        switch ((MenuBankEmp)userInput)
+                        {
+                            case MenuBankEmp.CreateNewAcc:
+                                Console.WriteLine("Enter Account Holder Name");
+                                string accHldrName = Console.ReadLine();
+                                Console.WriteLine("Enter Pin");
+                                string accPin = Console.ReadLine();
+                                Console.WriteLine("Enter Initial Account balance");
+                                string amtInput = Console.ReadLine();
+                                int amount;
+                                if(int.TryParse(amtInput, out amount))
+                                {
+                                    bankEmployeeService.CreatNewAccount(new AccountHolder()
+                                    {
+                                        accHolderName = accHldrName,
+                                        accNumber = accHldrName.Substring(0, 3) + DateTime.Now.ToString("ddMMyyyy"),
+                                        AccountBalance = Convert.ToDouble(amount),
+                                        AccPin = accPin
+                                    });
+                                    break;
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Invalid Amount");
+                                    break;
+                                }
+                               
 
-                        case MenuBankEmp.UpdateBankAccount:
-                            Console.WriteLine("Enter Account Number of Account To Be Updated");
-                            string accNum= Console.ReadLine();
-                            Console.WriteLine("Enter Updated Name");
-                            accHldrName = Console.ReadLine();
-                            Console.WriteLine("Enter Updated Pin");
-                            accPin= Console.ReadLine();
-                            bankEmployeeService.UpdateBankAccount(accNum, accPin,accHldrName);
-                            break;
+                            case MenuBankEmp.UpdateBankAccount:
+                                Console.WriteLine("Enter Account Number of Account To Be Updated");
+                                string accNum = Console.ReadLine();
+                                if(accHolderService.ValidateAccNum(accNum))
+                                {
+                                    Console.WriteLine("Enter Updated Name");
+                                    accHldrName = Console.ReadLine();
+                                    Console.WriteLine("Enter Updated Pin");
+                                    accPin = Console.ReadLine();
+                                    bankEmployeeService.UpdateBankAccount(accNum, accPin, accHldrName);
+                                    break;
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Invalid Account Number");
+                                    break;
+                                }
+                                
 
-                        case MenuBankEmp.UpdateCurrency:
-                            Console.WriteLine("Enter Updated Currency");
-                            string updatedCurrency = Console.ReadLine();
-                            Console.WriteLine("Enter Updated Exchange rates");
-                            string updatedExchangeRates= Console.ReadLine();
-                            bankEmployeeService.UpdateCurrency(updatedCurrency, updatedExchangeRates);
-                            break;
+                            case MenuBankEmp.UpdateCurrency:
+                                Console.WriteLine("Enter Updated Currency");
+                                string updatedCurrency = Console.ReadLine();
+                                Console.WriteLine("Enter Updated Exchange rates");
+                                string updatedExchangeRates = Console.ReadLine();
+                                bankEmployeeService.UpdateCurrency(updatedCurrency, updatedExchangeRates);
+                                break;
 
-                        case MenuBankEmp.UpdateRtgs:
-                            Console.WriteLine("Enter Updated Same RTGS");
-                            double updatedSameRtgs = Convert.ToDouble(Console.ReadLine());
-                            Console.WriteLine("Enter Updated Other RTGS");
-                            double updatedOtherRtgs = Convert.ToDouble(Console.ReadLine());
-                            bankEmployeeService.UpdateRtgs(updatedSameRtgs, updatedOtherRtgs);
-                            break;
+                            case MenuBankEmp.UpdateRtgs:
+                                Console.WriteLine("Enter Updated Same RTGS");
+                                int updatedSameRtgs; 
+                                string sameRtgsInput =Console.ReadLine();
+                                if(int.TryParse(sameRtgsInput, out updatedSameRtgs))
+                                {
+                                    Console.WriteLine("Enter Updated Other RTGS");
+                                    int updatedOtherRtgs;
+                                    string otherRtgsInput = Console.ReadLine();
+                                    if(int.TryParse(otherRtgsInput, out updatedOtherRtgs))
+                                    {
+                                        bankEmployeeService.UpdateRtgs(updatedSameRtgs, updatedOtherRtgs);
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("Invalid Input");
+                                        break;
+                                    }
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Invalid Input");
+                                    break;
+                                }
+                                
 
-                        case MenuBankEmp.UpdateImps:
-                            Console.WriteLine("Enter Updated Same IMPS");
-                            double updatedSameImps = Convert.ToDouble(Console.ReadLine());
-                            Console.WriteLine("Enter Updated Other IMPS");
-                            double updatedOtherImps = Convert.ToDouble(Console.ReadLine());
-                            bankEmployeeService.UpdateImps(updatedSameImps, updatedOtherImps);
-                            break;
+                            case MenuBankEmp.UpdateImps:
+                                Console.WriteLine("Enter Updated Same IMPS");
+                                int updatedSameImps;
+                                string sameImpsInput= Console.ReadLine();
+                                if (int.TryParse(sameImpsInput, out updatedSameImps) && updatedSameImps<=100)
+                                {
+                                    Console.WriteLine("Enter Updated Other IMPS");
+                                    int updatedOtherImps;
+                                    string otherImpsInput = Console.ReadLine();
+                                    if (int.TryParse(otherImpsInput, out updatedOtherImps) && updatedOtherImps <=100)
+                                    {
+                                        bankEmployeeService.UpdateImps(updatedSameImps, updatedOtherImps);
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("Invalid Input");
+                                        break;
+                                    }
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Invalid Input");
+                                    break;
+                                }
+                               
+                                
 
-                        case MenuBankEmp.ViewTransactionHistory:
-                            Console.WriteLine("Enter account Number");
-                            accNum= Console.ReadLine();
-                            bankEmployeeService.ViewTransectionHistory(accNum);
-                            break;
+                            case MenuBankEmp.ViewTransactionHistory:
+                                Console.WriteLine("Enter account Number");
+                                accNum = Console.ReadLine();
+                                if(accHolderService.ValidateAccNum(accNum))
+                                {
+                                    if (bankEmployeeService.ViewTransectionHistory(accNum).Any())
+                                    {
+                                        foreach(Transactions item in bankEmployeeService.ViewTransectionHistory(accNum))
+                                        {
+                                            Console.WriteLine("Transaction Number:-" + item.transectionNum);
+                                            Console.WriteLine("Transaction Amount:-" + item.transactionAmount);
+                                            Console.WriteLine("Recievers Account Number:-" + item.recieversAccNum);
+                                            Console.WriteLine("Recievers Bank Id:-" + item.sendersBankId);
+                                        }
+                                        break;
+                                    }
+                                    else 
+                                    {
+                                        Console.WriteLine("No Transactions Yet");
+                                        break;
+                                    }
 
-                        case MenuBankEmp.RevertTransaction:
-                            Console.WriteLine("Enter Transaction Number");
-                            string transactionNum = Console.ReadLine();
-                            bankEmployeeService.RevertTransection(transactionNum);
-                            break;
+                                    break;
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Invalid Account Number");
+                                    break;
+                                }
+                                
 
-                        case MenuBankEmp.DisplayAccdetails:
-                            Console.WriteLine("Enter Account number ");
-                            accNum= Console.ReadLine();
-                            AccountHolder accountDetail = new AccountHolder();
-                            accountDetail = bankEmployeeService.DisplayAccountDetails(accNum);
-                            Console.WriteLine("Account Number :-" + accountDetail.accNumber);
-                            Console.WriteLine("Account Holder Name :-" + accountDetail.accHolderName);
-                            Console.WriteLine("Account Balance :-" + accountDetail.AccountBalance);
-                            Console.WriteLine("BankId :-" + accountDetail.bankId);
-                            break;
+                            case MenuBankEmp.RevertTransaction:
+                                Console.WriteLine("Enter Transaction Number");
+                                string transactionNum = Console.ReadLine();
+                                if (bankingService.ValidateTransactionNumber(transactionNum))
+                                {
+                                    bankEmployeeService.RevertTransection(transactionNum);
+                                    break;
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Invalid Transaction Number");
+                                    break;
+                                }
+                                
 
-                        case MenuBankEmp.Exit:
-                            exit = true;
-                            break;
+                            case MenuBankEmp.DisplayAccdetails:
+                                Console.WriteLine("Enter Account number ");
+                                accNum = Console.ReadLine();
+                                if (accHolderService.ValidateAccNum(accNum))
+                                {
+                                    AccountHolder accountDetail = new AccountHolder();
+                                    accountDetail = bankEmployeeService.DisplayAccountDetails(accNum);
+                                    Console.WriteLine("Account Number :-" + accountDetail.accNumber);
+                                    Console.WriteLine("Account Holder Name :-" + accountDetail.accHolderName);
+                                    Console.WriteLine("Account Balance :-" + accountDetail.AccountBalance);
+                                    Console.WriteLine("BankId :-" + accountDetail.bankId);
+                                    break;
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Invalid Account Number");
+                                    break;
+                                }
+                                
+
+                            case MenuBankEmp.Exit:
+                                exit = true;
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("Invalid Input");
                     }
                 }
                 while (!exit);

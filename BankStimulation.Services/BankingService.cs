@@ -8,7 +8,7 @@ using System.Transactions;
 
 namespace BankStimulation.Services
 {
-    internal class BankingService
+    public class BankingService
     {
         public Bank yesBank = new Bank()
         {
@@ -57,6 +57,18 @@ namespace BankStimulation.Services
             {
                 yesBank.otherImps = otherImps;
                 yesBank.sameImps = sameImps;
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public bool ValidateTransactionNumber(string txnNum)
+        {
+            if (transactions.Any(txn => txn.transectionNum == txnNum))
+            {
                 return true;
             }
             else
