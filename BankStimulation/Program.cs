@@ -168,13 +168,29 @@ namespace BankStimulation
                                     {
                                         if (userInput == 1)
                                         {
-                                            accHolderService.TransferFundsRtgs(amount, rcvAccNum, rcvBankId);
-                                            break;
+                                            if(accHolderService.TransferFundsRtgs(amount, rcvAccNum, rcvBankId))
+                                            {
+                                                Console.WriteLine("Transfer Successful");
+                                                break;
+                                            }
+                                            else
+                                            {
+                                                Console.WriteLine("Transfer Unsuccessful");
+                                                break;
+                                            }   
                                         }
                                         else if (userInput == 2)
                                         {
-                                            accHolderService.TransferFundImps(amount, rcvAccNum, rcvBankId);
-                                            break;
+                                            if(accHolderService.TransferFundImps(amount, rcvAccNum, rcvBankId))
+                                            {
+                                                Console.WriteLine("Transfer Successful");
+                                                break;
+                                            }
+                                            else
+                                            {
+                                                Console.WriteLine("Transfer Unsuccessful");
+                                                break;
+                                            }
                                         }
                                         else
                                         {
@@ -258,14 +274,23 @@ namespace BankStimulation
                                 int amount;
                                 if(int.TryParse(amtInput, out amount))
                                 {
-                                    bankEmployeeService.CreatNewAccount(new AccountHolder()
+                                    if (bankEmployeeService.CreatNewAccount(new AccountHolder()
                                     {
                                         accHolderName = accHldrName,
                                         accNumber = accHldrName.Substring(0, 3) + DateTime.Now.ToString("ddMMyyyy"),
                                         AccountBalance = Convert.ToDouble(amount),
-                                        AccPin = accPin
-                                    });
-                                    break;
+                                        AccPin = accPin,
+                                        bankId = BankingService.yesBank.bankId
+                                    }))
+                                    {
+                                        Console.WriteLine("Account Created Successfully");
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("Unsuccessful");
+                                        break;
+                                    }
                                 }
                                 else
                                 {
@@ -283,8 +308,16 @@ namespace BankStimulation
                                     accHldrName = Console.ReadLine();
                                     Console.WriteLine("Enter Updated Pin");
                                     accPin = Console.ReadLine();
-                                    bankEmployeeService.UpdateBankAccount(accNum, accPin, accHldrName);
-                                    break;
+                                    if(bankEmployeeService.UpdateBankAccount(accNum, accPin, accHldrName))
+                                    {
+                                        Console.WriteLine("Account Updated Successfully");
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("Unsuccessful");
+                                        break;
+                                    }
                                 }
                                 else
                                 {
@@ -298,8 +331,16 @@ namespace BankStimulation
                                 string updatedCurrency = Console.ReadLine();
                                 Console.WriteLine("Enter Updated Exchange rates");
                                 string updatedExchangeRates = Console.ReadLine();
-                                bankEmployeeService.UpdateCurrency(updatedCurrency, updatedExchangeRates);
-                                break;
+                                if(bankEmployeeService.UpdateCurrency(updatedCurrency, updatedExchangeRates))
+                                {
+                                    Console.WriteLine("Update Successful");
+                                    break;
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Update Unsuccesful");
+                                    break;
+                                }
 
                             case MenuBankEmp.UpdateRtgs:
                                 Console.WriteLine("Enter Updated Same RTGS");
@@ -312,8 +353,16 @@ namespace BankStimulation
                                     string otherRtgsInput = Console.ReadLine();
                                     if(int.TryParse(otherRtgsInput, out updatedOtherRtgs))
                                     {
-                                        bankEmployeeService.UpdateRtgs(updatedSameRtgs, updatedOtherRtgs);
-                                        break;
+                                        if(bankEmployeeService.UpdateRtgs(updatedSameRtgs, updatedOtherRtgs))
+                                        {
+                                            Console.WriteLine("Update Successful");
+                                            break;
+                                        }
+                                        else
+                                        {
+                                            Console.WriteLine("Update Unsuccessful");
+                                            break;
+                                        }
                                     }
                                     else
                                     {
@@ -339,8 +388,16 @@ namespace BankStimulation
                                     string otherImpsInput = Console.ReadLine();
                                     if (int.TryParse(otherImpsInput, out updatedOtherImps) && updatedOtherImps <=100)
                                     {
-                                        bankEmployeeService.UpdateImps(updatedSameImps, updatedOtherImps);
-                                        break;
+                                        if(bankEmployeeService.UpdateImps(updatedSameImps, updatedOtherImps))
+                                        {
+                                            Console.WriteLine("Update Successful");
+                                            break;
+                                        }
+                                        else
+                                        {
+                                            Console.WriteLine("Update Unsuccessful");
+                                            break;
+                                        }
                                     }
                                     else
                                     {
@@ -392,8 +449,16 @@ namespace BankStimulation
                                 string transactionNum = Console.ReadLine();
                                 if (bankingService.ValidateTransactionNumber(transactionNum))
                                 {
-                                    bankEmployeeService.RevertTransection(transactionNum);
-                                    break;
+                                    if (bankEmployeeService.RevertTransection(transactionNum))
+                                    {
+                                        Console.WriteLine("Transaction Revert Successful");
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("Revert Unsuccessful");
+                                        break;
+                                    }
                                 }
                                 else
                                 {

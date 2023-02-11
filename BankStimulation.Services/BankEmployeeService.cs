@@ -5,7 +5,7 @@ namespace BankStimulation.Services
 {
     public class BankEmployeeService
     {
-        List<BankEmployee> bankEmp = new List<BankEmployee>()
+        static List<BankEmployee> bankEmp = new List<BankEmployee>()
         {
             new BankEmployee() {empId = "ram101" , empName = "Ramesh Verma" , Password = "qwerty@123"},
             new BankEmployee() {empId = "ani102" , empName = "Anish Singh" , Password = "qwerty@123"},
@@ -19,7 +19,7 @@ namespace BankStimulation.Services
 
         public AccountHolder DisplayAccountDetails(string accNum)
         {
-            return accHldrService.accHolder.FirstOrDefault(e => e.accNumber == accNum);
+            return AccountHolderService.accHolder.FirstOrDefault(e => e.accNumber == accNum);
         }
 
         public bool CreatNewAccount(AccountHolder accHolder)
@@ -39,7 +39,7 @@ namespace BankStimulation.Services
         public bool UpdateBankAccount(string accNumber,string accPin,string accHldrName)
         {
             
-            var currentDetails = accHldrService.accHolder.FirstOrDefault(accHldr => accHldr.accNumber == accNumber);
+            var currentDetails = AccountHolderService.accHolder.FirstOrDefault(accHldr => accHldr.accNumber == accNumber);
             if (currentDetails != null)
             {
                 if(accHldrName != null)
@@ -98,23 +98,29 @@ namespace BankStimulation.Services
         public List<Transactions> ViewTransectionHistory(string accNumber)
         {
             List<Transactions> txn = new List<Transactions>();
-            txn = bankingService.transactions.Where(txn => txn.senderAccNum == accNumber || txn.recieversAccNum == accNumber).ToList();
+            txn = BankingService.transactions.Where(txn => txn.senderAccNum == accNumber || txn.recieversAccNum == accNumber).ToList();
             return txn;
         }
 
-        public void RevertTransection(string txnNum)
+        public bool RevertTransection(string txnNum)
         {
             Transactions transactionToRevert = new Transactions();
-            transactionToRevert = bankingService.transactions.FirstOrDefault(txnToRevert => txnToRevert.transectionNum == txnNum);
-            if(transactionToRevert.sendersBankId == bankingService.yesBank.bankId)
+            transactionToRevert = BankingService.transactions.FirstOrDefault(txnToRevert => txnToRevert.transectionNum == txnNum);
+            if(transactionToRevert.sendersBankId == BankingService.yesBank.bankId)
             {
-                var accToRevertTxn = accHldrService.accHolder.FirstOrDefault(accToRvrtTxn => accToRvrtTxn.accNumber == transactionToRevert.senderAccNum);
+                var accToRevertTxn = AccountHolderService.accHolder.FirstOrDefault(accToRvrtTxn => accToRvrtTxn.accNumber == transactionToRevert.senderAccNum);
                 accToRevertTxn.AccountBalance += transactionToRevert.transactionAmount;
+                return true;
 
             }
-            else if(transactionToRevert.recieversBankId == bankingService.yesBank.bankId){
-                var accToRevertTxn = accHldrService.accHolder.FirstOrDefault(accToRvrtTxn => accToRvrtTxn.accNumber == transactionToRevert.recieversAccNum);
+            else if(transactionToRevert.recieversBankId == BankingService.yesBank.bankId){
+                var accToRevertTxn = AccountHolderService.accHolder.FirstOrDefault(accToRvrtTxn => accToRvrtTxn.accNumber == transactionToRevert.recieversAccNum);
                 accToRevertTxn.AccountBalance -= transactionToRevert.transactionAmount;
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
 

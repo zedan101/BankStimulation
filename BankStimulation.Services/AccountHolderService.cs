@@ -9,9 +9,8 @@ namespace BankStimulation.Services
 {
     public class AccountHolderService
     {
-        public List<AccountHolder> accHolder = new List<AccountHolder>();
+        static public List<AccountHolder> accHolder = new List<AccountHolder>();
         string loggedInUserAccNum;
-        BankingService bankService = new BankingService();
 
         public bool DepositeFund(double amount)
         {
@@ -43,10 +42,10 @@ namespace BankStimulation.Services
 
         }
 
-        public void TransferFundImps(double amount, string recieverAccNum, string recieverBankId)
+        public bool TransferFundImps(double amount, string recieverAccNum, string recieverBankId)
         {
             var accHldr = accHolder.FirstOrDefault(accHldr => accHldr.accNumber == loggedInUserAccNum);
-            if (recieverBankId == bankService.yesBank.bankId)
+            if (recieverBankId == BankingService.yesBank.bankId)
             {
                 if (accHldr.AccountBalance >= amount && amount != 0)
                 {
@@ -57,7 +56,12 @@ namespace BankStimulation.Services
                     newTransaction.senderAccNum = accHldr.accNumber;
                     newTransaction.transactionAmount = amount;
                     newTransaction.transectionNum = "TXN" + accHldr.bankId + accHldr.accNumber + DateTime.Now.ToString("ddMMyyyy");
-                    accHldr.AccountBalance -= (amount + amount * bankService.yesBank.sameImps / 100);
+                    accHldr.AccountBalance -= (amount + amount * BankingService.yesBank.sameImps / 100);
+                    return true;
+                }
+                else
+                {
+                    return false;
                 }
             }
             else
@@ -71,15 +75,20 @@ namespace BankStimulation.Services
                     newTransaction.senderAccNum = accHldr.accNumber;
                     newTransaction.transactionAmount = amount;
                     newTransaction.transectionNum = "TXN" + accHldr.bankId + accHldr.accNumber + DateTime.Now.ToString("ddMMyyyy");
-                    accHldr.AccountBalance -= (amount + amount * bankService.yesBank.otherImps / 100);
+                    accHldr.AccountBalance -= (amount + amount * BankingService.yesBank.otherImps / 100);
+                    return true;
+                }
+                else
+                {
+                    return false;
                 }
             }
         }
 
-        public void TransferFundsRtgs(double amount , string recieverAccNum,string recieverBankId)
+        public bool TransferFundsRtgs(double amount , string recieverAccNum,string recieverBankId)
         {
             var accHldr = accHolder.FirstOrDefault(accHldr => accHldr.accNumber == loggedInUserAccNum);
-            if (recieverBankId == bankService.yesBank.bankId)
+            if (recieverBankId == BankingService.yesBank.bankId)
             {
                 if (accHldr.AccountBalance >= amount && amount != 0)
                 {
@@ -90,7 +99,12 @@ namespace BankStimulation.Services
                     newTransaction.senderAccNum = accHldr.accNumber;
                     newTransaction.transactionAmount = amount;
                     newTransaction.transectionNum = "TXN" + accHldr.bankId + accHldr.accNumber + DateTime.Now.ToString("ddMMyyyy");
-                    accHldr.AccountBalance -= (amount + amount * bankService.yesBank.sameRtgs/100);
+                    accHldr.AccountBalance -= (amount + amount * BankingService.yesBank.sameRtgs/100);
+                    return true;
+                }
+                else
+                {
+                    return false;
                 }
             }
             else
@@ -104,15 +118,20 @@ namespace BankStimulation.Services
                     newTransaction.senderAccNum = accHldr.accNumber;
                     newTransaction.transactionAmount = amount;
                     newTransaction.transectionNum = "TXN" + accHldr.bankId + accHldr.accNumber + DateTime.Now.ToString("ddMMyyyy");
-                    accHldr.AccountBalance -= (amount + amount * bankService.yesBank.otherRtgs / 100);
-                }           
+                    accHldr.AccountBalance -= (amount + amount * BankingService.yesBank.otherRtgs / 100);
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
             }
         }
 
         public List<Transactions> ViewTransectionHistory()
         {
             List<Transactions> txn= new List<Transactions>();
-            txn = bankService.transactions.Where(txn=> txn.recieversAccNum == loggedInUserAccNum || txn.senderAccNum == loggedInUserAccNum).ToList();
+            txn = BankingService.transactions.Where(txn=> txn.recieversAccNum == loggedInUserAccNum || txn.senderAccNum == loggedInUserAccNum).ToList();
             return txn;
         }
 

@@ -10,7 +10,7 @@ namespace BankStimulation.Services
 {
     public class BankingService
     {
-        public Bank yesBank = new Bank()
+        static public Bank yesBank = new Bank()
         {
             bankId = "yes100223" ,
             sameRtgs = 0,
@@ -21,7 +21,7 @@ namespace BankStimulation.Services
             currencyExchangeRates = "1"
         };
 
-        public List<Transactions> transactions = new List<Transactions>();     
+        static public List<Transactions> transactions = new List<Transactions>();     
 
         public bool SetCurrency(string currency, string currencyExchangeRates)
         {
