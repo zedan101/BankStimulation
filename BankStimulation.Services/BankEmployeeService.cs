@@ -66,26 +66,14 @@ namespace BankStimulation.Services
 
         public bool UpdateRtgs(double updatedSameRtgs,double updatedOtherRtgs)
         {
-            if (_bankingService.SetRtgs(updatedSameRtgs, updatedOtherRtgs))
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return _bankingService.SetRtgs(updatedSameRtgs, updatedOtherRtgs);
+            
         }
 
         public bool UpdateImps(double updatedSameImps, double updatedOtherImps)
         {
-            if (_bankingService.SetImps(updatedSameImps, updatedOtherImps))
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+           return _bankingService.SetImps(updatedSameImps, updatedOtherImps);
+            
         }
 
         public List<Transaction> ViewTransectionHistory(string accNumber)
