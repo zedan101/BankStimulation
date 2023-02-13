@@ -17,69 +17,63 @@ namespace BankStimulation
             {
                 Console.WriteLine("For Bank Employee LogIn Enter 0");
                 Console.WriteLine("For Account Holder LogIn Enter 1");
-                string input =Console.ReadLine();
-                int userInput;
-                if(int.TryParse(input,out userInput))
-                {
-                    if (userInput == 0)
-                    {
-                        Console.WriteLine("Enter Employee Id");
-                        string empId = Console.ReadLine();
-                        if (bankEmployeeService.ValidateEmpId(empId))
+                try 
+                { 
+                    int input =Int32.Parse(Console.ReadLine());
+                 
+                        if (input == 0)
                         {
+                            Console.WriteLine("Enter Employee Id");
+                            string empId = Console.ReadLine();
                             Console.WriteLine("Enter Password");
                             string empPass = Console.ReadLine();
-                            if (bankEmployeeService.ValidateEmpPass(empPass))
+                            if (bankEmployeeService.ValidateEmpCredentials(empId, empPass))
                             {
                                 UiBankEmployee();
+                                break;
                             }
                             else
                             {
-                                Console.WriteLine("Invalid Password");
-                            }
-                        }
-                        else
-                        {
-                            Console.WriteLine("Invalid Id");
-                        }
+                                Console.WriteLine("Invalid Credentials");
+                                break;
 
-                    }
-                    else if (userInput == 1)
-                    {
-                        Console.WriteLine("Enter Employee Id");
-                        string accNum = Console.ReadLine();
-                        if (accHolderService.ValidateAccNum(accNum))
+                            }
+
+                        }
+                        else if (input == 1)
                         {
+                            Console.WriteLine("Enter Employee Id");
+                            string accNum = Console.ReadLine();
                             Console.WriteLine("Enter Password");
                             string accPin = Console.ReadLine();
-                            if (accHolderService.ValidateAccPin(accPin))
+                            if (accHolderService.ValidateAccNum(accNum) && accHolderService.ValidateAccPin(accPin))
                             {
                                 UiAccountHolder();
+                                break;
                             }
                             else
                             {
-                                Console.WriteLine("Invalid Password");
+                                Console.WriteLine("Invalid Id");
+                                break;
                             }
+                        }
+                        else if (input == 0)
+                        {
+                            exit = true;
+                            break;
                         }
                         else
                         {
-                            Console.WriteLine("Invalid Id");
+                            Console.WriteLine("Invalid Input");
+                            break;
                         }
-                    }
-                    else if (userInput == 0)
-                    {
-                        exit = true;
-                    }
-                    else
-                    {
-                        Console.WriteLine("Invalid Input");
-                    }
-                    Console.WriteLine("\n =========||||||||========== \n");
+                   
                 }
-                else
+                catch (FormatException)
                 {
-                    Console.WriteLine("Invalid Input");
+                    Console.WriteLine("Ivalid Input");
                 }
+                
             }
             while (!exit);
 
@@ -93,40 +87,51 @@ namespace BankStimulation
                     Console.WriteLine("To Transact Money Enter 3");
                     Console.WriteLine("To View Transaction history Enter 4");
                     Console.WriteLine("To Exit Enter 0");
-                    string input = Console.ReadLine();
-                    int userInput;
-                    if(int.TryParse(input, out userInput))
+                    try
                     {
-                        switch ((Enums.MenuAccHolder)userInput)
+                        int input = Int32.Parse(Console.ReadLine());
+
+                        switch ((Enums.MenuAccHolder)input)
                         {
                             case Enums.MenuAccHolder.DepositeMoney:
+                                Console.WriteLine("Enter Currency");
+                                string currency = Console.ReadLine();
                                 Console.WriteLine("\n Please enter the Amount");
-                                string amtInput = Console.ReadLine();
-                                int amount;
-                                if (int.TryParse(amtInput, out amount))
+                                try
                                 {
-                                    if (accHolderService.DepositeFund(Convert.ToDouble(amount)))
+                                    double amount = Convert.ToDouble(Console.ReadLine());
+                                    if (GlobalDataStorage.AcceptedCurrency.Any(e => e.AcceptedCurrency == currency))
                                     {
-                                        Console.WriteLine("Deposite Successful");
-                                        break;
+                                            if (accHolderService.DepositeFund(amount * GlobalDataStorage.AcceptedCurrency.FirstOrDefault(e => e.AcceptedCurrency == currency).ExchangeRate))
+                                            {
+                                                Console.WriteLine("Deposite Successful");
+                                                break;
+                                            }
+                                            else
+                                            {
+                                                Console.WriteLine("Unsuccessful");
+                                                break;
+                                            }
                                     }
                                     else
                                     {
-                                        Console.WriteLine("Unsuccessful");
+                                        Console.WriteLine("Invalid Currency");
                                         break;
                                     }
+
                                 }
-                                else
+                                catch (FormatException)
                                 {
-                                    Console.WriteLine("Invalid Input");
+                                    Console.WriteLine("Invalid Amount");
                                     break;
                                 }
+                                
 
                             case Enums.MenuAccHolder.WithdrawMoney:
                                 Console.WriteLine("\n Please enter amount to Withdraw");
-                                amtInput = Console.ReadLine();
-                                if (int.TryParse(amtInput, out amount))
+                                try
                                 {
+                                    double amount = Convert.ToDouble(Console.ReadLine());
                                     if (accHolderService.WithdrawFund(amount))
                                     {
                                         Console.WriteLine("Withdraw Successful");
@@ -138,9 +143,9 @@ namespace BankStimulation
                                         break;
                                     }
                                 }
-                                else
+                                catch (FormatException)
                                 {
-                                    Console.WriteLine("Invalid Input");
+                                    Console.WriteLine("Invalid amount");
                                     break;
                                 }
 
@@ -150,16 +155,17 @@ namespace BankStimulation
                                 Console.WriteLine("Enter Reciever bank Account Number");
                                 string rcvAccNum = Console.ReadLine();
                                 Console.WriteLine("Enter Amiount To tranfer");
-                                amtInput = Console.ReadLine();
-                                if (int.TryParse(amtInput, out amount))
+                                try
                                 {
+                                    double amount = Convert.ToDouble(Console.ReadLine());
                                     Console.WriteLine("Enter Transfet Type \t For RTGS->1 \t For IMPS->2 ");
-                                    input = Console.ReadLine();
-                                    if (int.TryParse(input, out userInput))
+                                    try
                                     {
-                                        if (userInput == 1)
+                                        input = Int32.Parse(Console.ReadLine());
+
+                                        if (input == 1)
                                         {
-                                            if(accHolderService.TransferFundsRtgs(amount, rcvAccNum, rcvBankId))
+                                            if (accHolderService.TransferFundsRtgs(amount, rcvAccNum, rcvBankId))
                                             {
                                                 Console.WriteLine("Transfer Successful");
                                                 break;
@@ -168,11 +174,11 @@ namespace BankStimulation
                                             {
                                                 Console.WriteLine("Transfer Unsuccessful");
                                                 break;
-                                            }   
+                                            }
                                         }
-                                        else if (userInput == 2)
+                                        else if (input == 2)
                                         {
-                                            if(accHolderService.TransferFundImps(amount, rcvAccNum, rcvBankId))
+                                            if (accHolderService.TransferFundImps(amount, rcvAccNum, rcvBankId))
                                             {
                                                 Console.WriteLine("Transfer Successful");
                                                 break;
@@ -189,16 +195,16 @@ namespace BankStimulation
                                             break;
                                         }
                                     }
-                                    else
+                                    catch (FormatException)
                                     {
                                         Console.WriteLine("Invalid Input");
                                         break;
                                     }
 
                                 }
-                                else
+                                catch (FormatException)
                                 {
-                                    Console.WriteLine("Invalid Input");
+                                    Console.WriteLine("Invalid Amount");
                                     break;
                                 }
 
@@ -211,7 +217,11 @@ namespace BankStimulation
                                         Console.WriteLine("Transaction Number:-" + item.TransectionNum);
                                         Console.WriteLine("Transaction Amount:-" + item.TransactionAmount);
                                         Console.WriteLine("Recievers Account Number:-" + item.RecieversAccNum);
+                                        Console.WriteLine("Recievers Bank Id :- " + item.RecieversBankId);
+                                        Console.WriteLine("Senders Account Number:- " + item.SenderAccNum);
                                         Console.WriteLine("Recievers Bank Id:-" + item.SendersBankId);
+                                        Console.WriteLine("Transaction Type:- " + item.TransactionType);
+                                        Console.WriteLine("Transaction Status :-" + item.TransactionStatus);
                                     }
                                     break;
                                 }
@@ -220,7 +230,7 @@ namespace BankStimulation
                                     Console.WriteLine("No Transactions Yet");
                                     break;
                                 }
-                                
+
 
                             case Enums.MenuAccHolder.Exit:
                                 exit = true;
@@ -228,12 +238,15 @@ namespace BankStimulation
 
                         }
                     }
-                    else
+                    catch (FormatException)
                     {
-                        Console.WriteLine("Invalid Input");
+                        Console.WriteLine("Ivalid Input");
                     }
                 }
                 while (!exit);
+                
+                
+
             }
             void UiBankEmployee()
             {
@@ -249,45 +262,52 @@ namespace BankStimulation
                     Console.WriteLine("To Revert A Transaction Enter 7");
                     Console.WriteLine("To Display Account Details Enter 8");
                     Console.WriteLine("To Exit Enter 0");
-                    string input = Console.ReadLine();
-                    int userInput;
-                    if (int.TryParse(input, out userInput))
+                    try
                     {
-                        switch ((Enums.MenuBankEmp)userInput)
+                        int input = Int32.Parse(Console.ReadLine());
+                        switch ((Enums.MenuBankEmp)input)
                         {
                             case Enums.MenuBankEmp.CreateNewAcc:
+                                AccountHolder accHolder = new ();
                                 Console.WriteLine("Enter Account Holder Name");
-                                string accHldrName = Console.ReadLine();
+                                accHolder.AccHolderName = Console.ReadLine();
                                 Console.WriteLine("Enter Pin");
-                                string accPin = Console.ReadLine();
+                                accHolder.AccPin = Console.ReadLine();
                                 Console.WriteLine("Enter Initial Account balance");
                                 string amtInput = Console.ReadLine();
-                                int amount;
-                                if(int.TryParse(amtInput, out amount))
+                                double amount;
+                                Console.WriteLine("Enter Currency");
+                                string currency= Console.ReadLine();
+                                if(GlobalDataStorage.AcceptedCurrency.Any(e => e.AcceptedCurrency == currency))
                                 {
-                                    if (bankEmployeeService.CreatNewAccount(new AccountHolder()
+                                    if (double.TryParse(amtInput, out amount) && amount>0)
                                     {
-                                        AccHolderName = accHldrName,
-                                        AccNumber = accHldrName.Substring(0, 3) + DateTime.Now.ToString("ddMMyyyy"),
-                                        AccountBalance = Convert.ToDouble(amount),
-                                        AccPin = accPin,
-                                        BankId = BankingService.yesBank.BankId
-                                    }))
-                                    {
-                                        Console.WriteLine("Account Created Successfully");
-                                        break;
+                                        accHolder.AccNumber = accHolder.AccHolderName.Substring(0, 3) + DateTime.Now.ToString("ddMMyyyy");
+                                        accHolder.AccountBalance = amount * GlobalDataStorage.AcceptedCurrency.FirstOrDefault(e => e.AcceptedCurrency == currency).ExchangeRate;
+                                        accHolder.BankId = GlobalDataStorage.yesBank.BankId;
+                                        if (bankEmployeeService.CreatNewAccount(accHolder))
+                                        {
+                                            Console.WriteLine("Account Created Successfully");
+                                            break;
+                                        }
+                                        else
+                                        {
+                                            Console.WriteLine("Unsuccessful");
+                                            break;
+                                        }
                                     }
                                     else
                                     {
-                                        Console.WriteLine("Unsuccessful");
+                                        Console.WriteLine("Invalid Amount");
                                         break;
                                     }
                                 }
                                 else
                                 {
-                                    Console.WriteLine("Invalid Amount");
+                                    Console.WriteLine("Invalid Currency");
                                     break;
                                 }
+                                
                                
 
                             case Enums.MenuBankEmp.UpdateBankAccount:
@@ -296,9 +316,9 @@ namespace BankStimulation
                                 if(accHolderService.ValidateAccNum(accNum))
                                 {
                                     Console.WriteLine("Enter Updated Name");
-                                    accHldrName = Console.ReadLine();
+                                    string accHldrName = Console.ReadLine();
                                     Console.WriteLine("Enter Updated Pin");
-                                    accPin = Console.ReadLine();
+                                    string accPin = Console.ReadLine();
                                     if(bankEmployeeService.UpdateBankAccount(accNum, accPin, accHldrName))
                                     {
                                         Console.WriteLine("Account Updated Successfully");
@@ -318,11 +338,12 @@ namespace BankStimulation
                                 
 
                             case Enums.MenuBankEmp.UpdateCurrency:
+                                Currency updateCurrency = new();
                                 Console.WriteLine("Enter Updated Currency");
-                                string updatedCurrency = Console.ReadLine();
+                                updateCurrency.AcceptedCurrency = Console.ReadLine();
                                 Console.WriteLine("Enter Updated Exchange rates");
-                                string updatedExchangeRates = Console.ReadLine();
-                                if(bankEmployeeService.UpdateCurrency(updatedCurrency, updatedExchangeRates))
+                                updateCurrency.ExchangeRate = Convert.ToDouble(Console.ReadLine());
+                                if(bankEmployeeService.UpdateCurrency(updateCurrency))
                                 {
                                     Console.WriteLine("Update Successful");
                                     break;
@@ -337,12 +358,12 @@ namespace BankStimulation
                                 Console.WriteLine("Enter Updated Same RTGS");
                                 int updatedSameRtgs; 
                                 string sameRtgsInput =Console.ReadLine();
-                                if(int.TryParse(sameRtgsInput, out updatedSameRtgs))
+                                if(int.TryParse(sameRtgsInput, out updatedSameRtgs) && updatedSameRtgs <= 100)
                                 {
                                     Console.WriteLine("Enter Updated Other RTGS");
                                     int updatedOtherRtgs;
                                     string otherRtgsInput = Console.ReadLine();
-                                    if(int.TryParse(otherRtgsInput, out updatedOtherRtgs))
+                                    if(int.TryParse(otherRtgsInput, out updatedOtherRtgs) && updatedOtherRtgs<=100)
                                     {
                                         if(bankEmployeeService.UpdateRtgs(updatedSameRtgs, updatedOtherRtgs))
                                         {
@@ -416,7 +437,11 @@ namespace BankStimulation
                                             Console.WriteLine("Transaction Number:-" + item.TransectionNum);
                                             Console.WriteLine("Transaction Amount:-" + item.TransactionAmount);
                                             Console.WriteLine("Recievers Account Number:-" + item.RecieversAccNum);
+                                            Console.WriteLine("Recievers Bank Id :- " + item.RecieversBankId);
+                                            Console.WriteLine("Senders Account Number:- " + item.SenderAccNum);
                                             Console.WriteLine("Recievers Bank Id:-" + item.SendersBankId);
+                                            Console.WriteLine("Transaction Type:- " + item.TransactionType);
+                                            Console.WriteLine("Transaction Status :-" + item.TransactionStatus);
                                         }
                                         break;
                                     }
@@ -425,8 +450,6 @@ namespace BankStimulation
                                         Console.WriteLine("No Transactions Yet");
                                         break;
                                     }
-
-                                    break;
                                 }
                                 else
                                 {
@@ -483,7 +506,7 @@ namespace BankStimulation
                                 break;
                         }
                     }
-                    else
+                    catch (FormatException)
                     {
                         Console.WriteLine("Invalid Input");
                     }

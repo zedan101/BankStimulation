@@ -9,12 +9,11 @@ namespace BankStimulation.Services
 {
     public class AccountHolderService
     {
-        static public List<AccountHolder> AccHolder = new List<AccountHolder>();
         string loggedInUserAccNum;
 
         public bool DepositeFund(double amount)
         {
-            var accHldr = AccHolder.FirstOrDefault(accHldr => accHldr.AccNumber== loggedInUserAccNum);
+            var accHldr = GlobalDataStorage. AccHolder.FirstOrDefault(accHldr => accHldr.AccNumber== loggedInUserAccNum);
             if(amount != 0 )
             {
                 accHldr.AccountBalance += amount;
@@ -29,7 +28,7 @@ namespace BankStimulation.Services
 
         public bool WithdrawFund(double amount)
         {
-            var accHldr = AccHolder.FirstOrDefault(accHldr => accHldr.AccNumber == loggedInUserAccNum);
+            var accHldr = GlobalDataStorage.AccHolder.FirstOrDefault(accHldr => accHldr.AccNumber == loggedInUserAccNum);
             if(accHldr.AccountBalance >= amount && amount != 0 )
             {
                 accHldr.AccountBalance -= amount;
@@ -44,8 +43,8 @@ namespace BankStimulation.Services
 
         public bool TransferFundImps(double amount, string recieverAccNum, string recieverBankId)
         {
-            var accHldr = AccHolder.FirstOrDefault(accHldr => accHldr.AccNumber == loggedInUserAccNum);
-            if (recieverBankId == BankingService.yesBank.BankId)
+            var accHldr = GlobalDataStorage.AccHolder.FirstOrDefault(accHldr => accHldr.AccNumber == loggedInUserAccNum);
+            if (recieverBankId == GlobalDataStorage.yesBank.BankId)
             {
                 if (accHldr.AccountBalance >= amount && amount != 0)
                 {
@@ -55,8 +54,10 @@ namespace BankStimulation.Services
                     newTransaction.RecieversAccNum = recieverAccNum;
                     newTransaction.SenderAccNum = accHldr.AccNumber;
                     newTransaction.TransactionAmount = amount;
+                    newTransaction.TransactionType = "IMPS";
                     newTransaction.TransectionNum = "TXN" + accHldr.BankId + accHldr.AccNumber + DateTime.Now.ToString("ddMMyyyy");
-                    accHldr.AccountBalance -= (amount + amount * BankingService.yesBank.SameImpsCharges / 100);
+                    accHldr.AccountBalance -= (amount + amount * GlobalDataStorage.yesBank.SameImpsCharges / 100);
+                    newTransaction.TransactionStatus = "Success";
                     return true;
                 }
                 else
@@ -74,8 +75,10 @@ namespace BankStimulation.Services
                     newTransaction.RecieversAccNum = recieverAccNum;
                     newTransaction.SenderAccNum = accHldr.AccNumber;
                     newTransaction.TransactionAmount = amount;
+                    newTransaction.TransactionType = "IMPS";
                     newTransaction.TransectionNum = "TXN" + accHldr.BankId + accHldr.AccNumber + DateTime.Now.ToString("ddMMyyyy");
-                    accHldr.AccountBalance -= (amount + amount * BankingService.yesBank.OtherImpsCharges / 100);
+                    accHldr.AccountBalance -= (amount + amount * GlobalDataStorage.yesBank.OtherImpsCharges / 100);
+                    newTransaction.TransactionStatus = "Success";
                     return true;
                 }
                 else
@@ -87,8 +90,8 @@ namespace BankStimulation.Services
 
         public bool TransferFundsRtgs(double amount , string recieverAccNum,string recieverBankId)
         {
-            var accHldr = AccHolder.FirstOrDefault(accHldr => accHldr.AccNumber == loggedInUserAccNum);
-            if (recieverBankId == BankingService.yesBank.BankId)
+            var accHldr = GlobalDataStorage.AccHolder.FirstOrDefault(accHldr => accHldr.AccNumber == loggedInUserAccNum);
+            if (recieverBankId == GlobalDataStorage.yesBank.BankId)
             {
                 if (accHldr.AccountBalance >= amount && amount != 0)
                 {
@@ -98,8 +101,10 @@ namespace BankStimulation.Services
                     newTransaction.RecieversAccNum = recieverAccNum;
                     newTransaction.SenderAccNum = accHldr.AccNumber;
                     newTransaction.TransactionAmount = amount;
+                    newTransaction.TransactionType = "RTGS";
                     newTransaction.TransectionNum = "TXN" + accHldr.BankId + accHldr.AccNumber + DateTime.Now.ToString("ddMMyyyy");
-                    accHldr.AccountBalance -= (amount + amount * BankingService.yesBank.SameRtgsCharges/100);
+                    accHldr.AccountBalance -= (amount + amount * GlobalDataStorage.yesBank.SameRtgsCharges/100);
+                    newTransaction.TransactionStatus = "Pending";
                     return true;
                 }
                 else
@@ -117,8 +122,10 @@ namespace BankStimulation.Services
                     newTransaction.RecieversAccNum = recieverAccNum;
                     newTransaction.SenderAccNum = accHldr.AccNumber;
                     newTransaction.TransactionAmount = amount;
+                    newTransaction.TransactionType = "RTGS";
                     newTransaction.TransectionNum = "TXN" + accHldr.BankId + accHldr.AccNumber + DateTime.Now.ToString("ddMMyyyy");
-                    accHldr.AccountBalance -= (amount + amount * BankingService.yesBank.OtherRtgsCharges / 100);
+                    accHldr.AccountBalance -= (amount + amount * GlobalDataStorage.yesBank.OtherRtgsCharges / 100);
+                    newTransaction.TransactionStatus = "Pending";
                     return true;
                 }
                 else
@@ -131,7 +138,7 @@ namespace BankStimulation.Services
         public List<Transaction> ViewTransectionHistory()
         {
             
-            var txn = BankingService.Transactions.Where(txn=> txn.RecieversAccNum == loggedInUserAccNum || txn.SenderAccNum == loggedInUserAccNum).ToList();
+            var txn = GlobalDataStorage.Transactions.Where(txn=> txn.RecieversAccNum == loggedInUserAccNum || txn.SenderAccNum == loggedInUserAccNum).ToList();
             return txn;
         }
 
@@ -139,7 +146,7 @@ namespace BankStimulation.Services
         {
             if(accountHolder!=null)
             {
-                AccHolder.Add(accountHolder);
+                GlobalDataStorage.AccHolder.Add(accountHolder);
                 return true;
             }
             else
@@ -151,7 +158,7 @@ namespace BankStimulation.Services
 
         public bool ValidateAccNum(string accNum)
         {
-            if (AccHolder.Any(accHldr => accHldr.AccNumber == accNum))
+            if (GlobalDataStorage.AccHolder.Any(accHldr => accHldr.AccNumber == accNum))
             {
                 loggedInUserAccNum= accNum;
                 return true;
@@ -164,7 +171,7 @@ namespace BankStimulation.Services
 
         public bool ValidateAccPin(string accPin)
         {
-            if (AccHolder.Any(accHldr => accHldr.AccPin == accPin))
+            if (GlobalDataStorage.AccHolder.Any(accHldr => accHldr.AccPin == accPin))
             {
                 return true;
             }

@@ -14,6 +14,8 @@ namespace BankStimulation.Model
         public string RecieversBankId;
         public string TransectionNum;
         public double TransactionAmount;
+        public string TransactionStatus;
+        public string TransactionType;
 
     }
 }
