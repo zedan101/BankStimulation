@@ -5,13 +5,13 @@ namespace BankStimulation.Services
 {
     public class BankEmployeeService
     {
-        static List<BankEmployee> bankEmp = new List<BankEmployee>()
+        static List<BankEmployee> BankEmp = new List<BankEmployee>()
         {
-            new BankEmployee() {empId = "ram101" , empName = "Ramesh Verma" , Password = "qwerty@123"},
-            new BankEmployee() {empId = "ani102" , empName = "Anish Singh" , Password = "qwerty@123"},
-            new BankEmployee() {empId = "nav103" , empName = "Naveen Gour" , Password = "qwerty@123"},
-            new BankEmployee() {empId = "shi104" , empName = "Shiva Gupta" , Password = "qwerty@123"},
-            new BankEmployee() {empId = "moh105" , empName = "Mohan Raj" , Password = "qwerty@123"},
+            new BankEmployee() {EmpId = "ram101" , EmpName = "Ramesh Verma" , Password = "qwerty@123"},
+            new BankEmployee() {EmpId = "ani102" , EmpName = "Anish Singh" , Password = "qwerty@123"},
+            new BankEmployee() {EmpId = "nav103" , EmpName = "Naveen Gour" , Password = "qwerty@123"},
+            new BankEmployee() {EmpId = "shi104" , EmpName = "Shiva Gupta" , Password = "qwerty@123"},
+            new BankEmployee() {EmpId = "moh105" , EmpName = "Mohan Raj" , Password = "qwerty@123"},
         };
 
         AccountHolderService accHldrService = new AccountHolderService();
@@ -19,7 +19,7 @@ namespace BankStimulation.Services
 
         public AccountHolder DisplayAccountDetails(string accNum)
         {
-            return AccountHolderService.accHolder.FirstOrDefault(e => e.accNumber == accNum);
+            return AccountHolderService.AccHolder.FirstOrDefault(e => e.AccNumber == accNum);
         }
 
         public bool CreatNewAccount(AccountHolder accHolder)
@@ -39,12 +39,12 @@ namespace BankStimulation.Services
         public bool UpdateBankAccount(string accNumber,string accPin,string accHldrName)
         {
             
-            var currentDetails = AccountHolderService.accHolder.FirstOrDefault(accHldr => accHldr.accNumber == accNumber);
+            var currentDetails = AccountHolderService.AccHolder.FirstOrDefault(accHldr => accHldr.AccNumber == accNumber);
             if (currentDetails != null)
             {
                 if(accHldrName != null)
                 {
-                    currentDetails.accHolderName = accHldrName;
+                    currentDetails.AccHolderName = accHldrName;
                 }
                 if(accPin != null)
                 {
@@ -95,27 +95,27 @@ namespace BankStimulation.Services
             }
         }
 
-        public List<Transactions> ViewTransectionHistory(string accNumber)
+        public List<Transaction> ViewTransectionHistory(string accNumber)
         {
-            List<Transactions> txn = new List<Transactions>();
-            txn = BankingService.transactions.Where(txn => txn.senderAccNum == accNumber || txn.recieversAccNum == accNumber).ToList();
+            List<Transaction> txn = new List<Transaction>();
+            txn = BankingService.Transactions.Where(txn => txn.SenderAccNum == accNumber || txn.RecieversAccNum == accNumber).ToList();
             return txn;
         }
 
         public bool RevertTransection(string txnNum)
         {
-            Transactions transactionToRevert = new Transactions();
-            transactionToRevert = BankingService.transactions.FirstOrDefault(txnToRevert => txnToRevert.transectionNum == txnNum);
-            if(transactionToRevert.sendersBankId == BankingService.yesBank.bankId)
+            Transaction transactionToRevert = new Transaction();
+            transactionToRevert = BankingService.Transactions.FirstOrDefault(txnToRevert => txnToRevert.TransectionNum == txnNum);
+            if(transactionToRevert.SendersBankId == BankingService.yesBank.BankId)
             {
-                var accToRevertTxn = AccountHolderService.accHolder.FirstOrDefault(accToRvrtTxn => accToRvrtTxn.accNumber == transactionToRevert.senderAccNum);
-                accToRevertTxn.AccountBalance += transactionToRevert.transactionAmount;
+                var accToRevertTxn = AccountHolderService.AccHolder.FirstOrDefault(accToRvrtTxn => accToRvrtTxn.AccNumber == transactionToRevert.SenderAccNum);
+                accToRevertTxn.AccountBalance += transactionToRevert.TransactionAmount;
                 return true;
 
             }
-            else if(transactionToRevert.recieversBankId == BankingService.yesBank.bankId){
-                var accToRevertTxn = AccountHolderService.accHolder.FirstOrDefault(accToRvrtTxn => accToRvrtTxn.accNumber == transactionToRevert.recieversAccNum);
-                accToRevertTxn.AccountBalance -= transactionToRevert.transactionAmount;
+            else if(transactionToRevert.RecieversBankId == BankingService.yesBank.BankId){
+                var accToRevertTxn = AccountHolderService.AccHolder.FirstOrDefault(accToRvrtTxn => accToRvrtTxn.AccNumber == transactionToRevert.RecieversAccNum);
+                accToRevertTxn.AccountBalance -= transactionToRevert.TransactionAmount;
                 return true;
             }
             else
@@ -126,7 +126,7 @@ namespace BankStimulation.Services
 
         public bool ValidateEmpId(string empId)
          {
-            if (bankEmp.Any(bnkEmp => bnkEmp.empId == empId))
+            if (BankEmp.Any(bnkEmp => bnkEmp.EmpId == empId))
             {
                 return true;
             }
@@ -138,7 +138,7 @@ namespace BankStimulation.Services
 
         public bool ValidateEmpPass(string empPass)
         {
-            if (bankEmp.Any(bnkEmp => bnkEmp.Password == empPass))
+            if (BankEmp.Any(bnkEmp => bnkEmp.Password == empPass))
             {
                 return true;
             }

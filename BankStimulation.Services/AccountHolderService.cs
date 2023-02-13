@@ -9,12 +9,12 @@ namespace BankStimulation.Services
 {
     public class AccountHolderService
     {
-        static public List<AccountHolder> accHolder = new List<AccountHolder>();
+        static public List<AccountHolder> AccHolder = new List<AccountHolder>();
         string loggedInUserAccNum;
 
         public bool DepositeFund(double amount)
         {
-            var accHldr = accHolder.FirstOrDefault(accHldr => accHldr.accNumber== loggedInUserAccNum);
+            var accHldr = AccHolder.FirstOrDefault(accHldr => accHldr.AccNumber== loggedInUserAccNum);
             if(amount != 0 )
             {
                 accHldr.AccountBalance += amount;
@@ -29,7 +29,7 @@ namespace BankStimulation.Services
 
         public bool WithdrawFund(double amount)
         {
-            var accHldr = accHolder.FirstOrDefault(accHldr => accHldr.accNumber == loggedInUserAccNum);
+            var accHldr = AccHolder.FirstOrDefault(accHldr => accHldr.AccNumber == loggedInUserAccNum);
             if(accHldr.AccountBalance >= amount && amount != 0 )
             {
                 accHldr.AccountBalance -= amount;
@@ -44,19 +44,19 @@ namespace BankStimulation.Services
 
         public bool TransferFundImps(double amount, string recieverAccNum, string recieverBankId)
         {
-            var accHldr = accHolder.FirstOrDefault(accHldr => accHldr.accNumber == loggedInUserAccNum);
-            if (recieverBankId == BankingService.yesBank.bankId)
+            var accHldr = AccHolder.FirstOrDefault(accHldr => accHldr.AccNumber == loggedInUserAccNum);
+            if (recieverBankId == BankingService.yesBank.BankId)
             {
                 if (accHldr.AccountBalance >= amount && amount != 0)
                 {
-                    Transactions newTransaction = new Transactions();
-                    newTransaction.sendersBankId = accHldr.bankId;
-                    newTransaction.recieversBankId = recieverBankId;
-                    newTransaction.recieversAccNum = recieverAccNum;
-                    newTransaction.senderAccNum = accHldr.accNumber;
-                    newTransaction.transactionAmount = amount;
-                    newTransaction.transectionNum = "TXN" + accHldr.bankId + accHldr.accNumber + DateTime.Now.ToString("ddMMyyyy");
-                    accHldr.AccountBalance -= (amount + amount * BankingService.yesBank.sameImps / 100);
+                    Transaction newTransaction = new Transaction();
+                    newTransaction.SendersBankId = accHldr.BankId;
+                    newTransaction.RecieversBankId = recieverBankId;
+                    newTransaction.RecieversAccNum = recieverAccNum;
+                    newTransaction.SenderAccNum = accHldr.AccNumber;
+                    newTransaction.TransactionAmount = amount;
+                    newTransaction.TransectionNum = "TXN" + accHldr.BankId + accHldr.AccNumber + DateTime.Now.ToString("ddMMyyyy");
+                    accHldr.AccountBalance -= (amount + amount * BankingService.yesBank.SameImpsCharges / 100);
                     return true;
                 }
                 else
@@ -68,14 +68,14 @@ namespace BankStimulation.Services
             {
                 if (accHldr.AccountBalance >= amount && amount != 0)
                 {
-                    Transactions newTransaction = new Transactions();
-                    newTransaction.sendersBankId = accHldr.bankId;
-                    newTransaction.recieversBankId = recieverBankId;
-                    newTransaction.recieversAccNum = recieverAccNum;
-                    newTransaction.senderAccNum = accHldr.accNumber;
-                    newTransaction.transactionAmount = amount;
-                    newTransaction.transectionNum = "TXN" + accHldr.bankId + accHldr.accNumber + DateTime.Now.ToString("ddMMyyyy");
-                    accHldr.AccountBalance -= (amount + amount * BankingService.yesBank.otherImps / 100);
+                    Transaction newTransaction = new Transaction();
+                    newTransaction.SendersBankId = accHldr.BankId;
+                    newTransaction.RecieversBankId = recieverBankId;
+                    newTransaction.RecieversAccNum = recieverAccNum;
+                    newTransaction.SenderAccNum = accHldr.AccNumber;
+                    newTransaction.TransactionAmount = amount;
+                    newTransaction.TransectionNum = "TXN" + accHldr.BankId + accHldr.AccNumber + DateTime.Now.ToString("ddMMyyyy");
+                    accHldr.AccountBalance -= (amount + amount * BankingService.yesBank.OtherImpsCharges / 100);
                     return true;
                 }
                 else
@@ -87,19 +87,19 @@ namespace BankStimulation.Services
 
         public bool TransferFundsRtgs(double amount , string recieverAccNum,string recieverBankId)
         {
-            var accHldr = accHolder.FirstOrDefault(accHldr => accHldr.accNumber == loggedInUserAccNum);
-            if (recieverBankId == BankingService.yesBank.bankId)
+            var accHldr = AccHolder.FirstOrDefault(accHldr => accHldr.AccNumber == loggedInUserAccNum);
+            if (recieverBankId == BankingService.yesBank.BankId)
             {
                 if (accHldr.AccountBalance >= amount && amount != 0)
                 {
-                    Transactions newTransaction = new Transactions();
-                    newTransaction.sendersBankId = accHldr.bankId;
-                    newTransaction.recieversBankId = recieverBankId;
-                    newTransaction.recieversAccNum = recieverAccNum;
-                    newTransaction.senderAccNum = accHldr.accNumber;
-                    newTransaction.transactionAmount = amount;
-                    newTransaction.transectionNum = "TXN" + accHldr.bankId + accHldr.accNumber + DateTime.Now.ToString("ddMMyyyy");
-                    accHldr.AccountBalance -= (amount + amount * BankingService.yesBank.sameRtgs/100);
+                    Transaction newTransaction = new Transaction();
+                    newTransaction.SendersBankId = accHldr.BankId;
+                    newTransaction.RecieversBankId = recieverBankId;
+                    newTransaction.RecieversAccNum = recieverAccNum;
+                    newTransaction.SenderAccNum = accHldr.AccNumber;
+                    newTransaction.TransactionAmount = amount;
+                    newTransaction.TransectionNum = "TXN" + accHldr.BankId + accHldr.AccNumber + DateTime.Now.ToString("ddMMyyyy");
+                    accHldr.AccountBalance -= (amount + amount * BankingService.yesBank.SameRtgsCharges/100);
                     return true;
                 }
                 else
@@ -111,14 +111,14 @@ namespace BankStimulation.Services
             {
                 if (accHldr.AccountBalance >= amount && amount != 0)
                 {
-                    Transactions newTransaction = new Transactions();
-                    newTransaction.sendersBankId = accHldr.bankId;
-                    newTransaction.recieversBankId = recieverBankId;
-                    newTransaction.recieversAccNum = recieverAccNum;
-                    newTransaction.senderAccNum = accHldr.accNumber;
-                    newTransaction.transactionAmount = amount;
-                    newTransaction.transectionNum = "TXN" + accHldr.bankId + accHldr.accNumber + DateTime.Now.ToString("ddMMyyyy");
-                    accHldr.AccountBalance -= (amount + amount * BankingService.yesBank.otherRtgs / 100);
+                    Transaction newTransaction = new Transaction();
+                    newTransaction.SendersBankId = accHldr.BankId;
+                    newTransaction.RecieversBankId = recieverBankId;
+                    newTransaction.RecieversAccNum = recieverAccNum;
+                    newTransaction.SenderAccNum = accHldr.AccNumber;
+                    newTransaction.TransactionAmount = amount;
+                    newTransaction.TransectionNum = "TXN" + accHldr.BankId + accHldr.AccNumber + DateTime.Now.ToString("ddMMyyyy");
+                    accHldr.AccountBalance -= (amount + amount * BankingService.yesBank.OtherRtgsCharges / 100);
                     return true;
                 }
                 else
@@ -128,10 +128,10 @@ namespace BankStimulation.Services
             }
         }
 
-        public List<Transactions> ViewTransectionHistory()
+        public List<Transaction> ViewTransectionHistory()
         {
-            List<Transactions> txn= new List<Transactions>();
-            txn = BankingService.transactions.Where(txn=> txn.recieversAccNum == loggedInUserAccNum || txn.senderAccNum == loggedInUserAccNum).ToList();
+            
+            var txn = BankingService.Transactions.Where(txn=> txn.RecieversAccNum == loggedInUserAccNum || txn.SenderAccNum == loggedInUserAccNum).ToList();
             return txn;
         }
 
@@ -139,7 +139,7 @@ namespace BankStimulation.Services
         {
             if(accountHolder!=null)
             {
-                accHolder.Add(accountHolder);
+                AccHolder.Add(accountHolder);
                 return true;
             }
             else
@@ -151,7 +151,7 @@ namespace BankStimulation.Services
 
         public bool ValidateAccNum(string accNum)
         {
-            if (accHolder.Any(accHldr => accHldr.accNumber == accNum))
+            if (AccHolder.Any(accHldr => accHldr.AccNumber == accNum))
             {
                 loggedInUserAccNum= accNum;
                 return true;
@@ -164,7 +164,7 @@ namespace BankStimulation.Services
 
         public bool ValidateAccPin(string accPin)
         {
-            if (accHolder.Any(accHldr => accHldr.AccPin == accPin))
+            if (AccHolder.Any(accHldr => accHldr.AccPin == accPin))
             {
                 return true;
             }

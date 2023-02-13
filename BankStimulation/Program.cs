@@ -6,15 +6,6 @@ namespace BankStimulation
 {
     public class Program
     {
-        enum MenuAccHolder
-        {
-            Exit, DepositeMoney, WithdrawMoney, transactMoney, transactionHistory 
-        }
-        enum MenuBankEmp
-        {
-            Exit, CreateNewAcc , UpdateBankAccount , UpdateCurrency , UpdateRtgs , UpdateImps , ViewTransactionHistory , RevertTransaction , DisplayAccdetails
-        }
-
         static void Main(string[] args)
         {
             AccountHolderService accHolderService = new AccountHolderService();
@@ -106,9 +97,9 @@ namespace BankStimulation
                     int userInput;
                     if(int.TryParse(input, out userInput))
                     {
-                        switch ((MenuAccHolder)userInput)
+                        switch ((Enums.MenuAccHolder)userInput)
                         {
-                            case MenuAccHolder.DepositeMoney:
+                            case Enums.MenuAccHolder.DepositeMoney:
                                 Console.WriteLine("\n Please enter the Amount");
                                 string amtInput = Console.ReadLine();
                                 int amount;
@@ -131,7 +122,7 @@ namespace BankStimulation
                                     break;
                                 }
 
-                            case MenuAccHolder.WithdrawMoney:
+                            case Enums.MenuAccHolder.WithdrawMoney:
                                 Console.WriteLine("\n Please enter amount to Withdraw");
                                 amtInput = Console.ReadLine();
                                 if (int.TryParse(amtInput, out amount))
@@ -153,7 +144,7 @@ namespace BankStimulation
                                     break;
                                 }
 
-                            case MenuAccHolder.transactMoney:
+                            case Enums.MenuAccHolder.transactMoney:
                                 Console.WriteLine("Enter reciever Bank Id");
                                 string rcvBankId = Console.ReadLine();
                                 Console.WriteLine("Enter Reciever bank Account Number");
@@ -212,15 +203,15 @@ namespace BankStimulation
                                 }
 
 
-                            case MenuAccHolder.transactionHistory:
+                            case Enums.MenuAccHolder.transactionHistory:
                                 if (accHolderService.ViewTransectionHistory().Any())
                                 {
-                                    foreach (Transactions item in accHolderService.ViewTransectionHistory())
+                                    foreach (Transaction item in accHolderService.ViewTransectionHistory())
                                     {
-                                        Console.WriteLine("Transaction Number:-" + item.transectionNum);
-                                        Console.WriteLine("Transaction Amount:-" + item.transactionAmount);
-                                        Console.WriteLine("Recievers Account Number:-" + item.recieversAccNum);
-                                        Console.WriteLine("Recievers Bank Id:-" + item.sendersBankId);
+                                        Console.WriteLine("Transaction Number:-" + item.TransectionNum);
+                                        Console.WriteLine("Transaction Amount:-" + item.TransactionAmount);
+                                        Console.WriteLine("Recievers Account Number:-" + item.RecieversAccNum);
+                                        Console.WriteLine("Recievers Bank Id:-" + item.SendersBankId);
                                     }
                                     break;
                                 }
@@ -231,7 +222,7 @@ namespace BankStimulation
                                 }
                                 
 
-                            case MenuAccHolder.Exit:
+                            case Enums.MenuAccHolder.Exit:
                                 exit = true;
                                 break;
 
@@ -262,9 +253,9 @@ namespace BankStimulation
                     int userInput;
                     if (int.TryParse(input, out userInput))
                     {
-                        switch ((MenuBankEmp)userInput)
+                        switch ((Enums.MenuBankEmp)userInput)
                         {
-                            case MenuBankEmp.CreateNewAcc:
+                            case Enums.MenuBankEmp.CreateNewAcc:
                                 Console.WriteLine("Enter Account Holder Name");
                                 string accHldrName = Console.ReadLine();
                                 Console.WriteLine("Enter Pin");
@@ -276,11 +267,11 @@ namespace BankStimulation
                                 {
                                     if (bankEmployeeService.CreatNewAccount(new AccountHolder()
                                     {
-                                        accHolderName = accHldrName,
-                                        accNumber = accHldrName.Substring(0, 3) + DateTime.Now.ToString("ddMMyyyy"),
+                                        AccHolderName = accHldrName,
+                                        AccNumber = accHldrName.Substring(0, 3) + DateTime.Now.ToString("ddMMyyyy"),
                                         AccountBalance = Convert.ToDouble(amount),
                                         AccPin = accPin,
-                                        bankId = BankingService.yesBank.bankId
+                                        BankId = BankingService.yesBank.BankId
                                     }))
                                     {
                                         Console.WriteLine("Account Created Successfully");
@@ -299,7 +290,7 @@ namespace BankStimulation
                                 }
                                
 
-                            case MenuBankEmp.UpdateBankAccount:
+                            case Enums.MenuBankEmp.UpdateBankAccount:
                                 Console.WriteLine("Enter Account Number of Account To Be Updated");
                                 string accNum = Console.ReadLine();
                                 if(accHolderService.ValidateAccNum(accNum))
@@ -326,7 +317,7 @@ namespace BankStimulation
                                 }
                                 
 
-                            case MenuBankEmp.UpdateCurrency:
+                            case Enums.MenuBankEmp.UpdateCurrency:
                                 Console.WriteLine("Enter Updated Currency");
                                 string updatedCurrency = Console.ReadLine();
                                 Console.WriteLine("Enter Updated Exchange rates");
@@ -342,7 +333,7 @@ namespace BankStimulation
                                     break;
                                 }
 
-                            case MenuBankEmp.UpdateRtgs:
+                            case Enums.MenuBankEmp.UpdateRtgs:
                                 Console.WriteLine("Enter Updated Same RTGS");
                                 int updatedSameRtgs; 
                                 string sameRtgsInput =Console.ReadLine();
@@ -377,7 +368,7 @@ namespace BankStimulation
                                 }
                                 
 
-                            case MenuBankEmp.UpdateImps:
+                            case Enums.MenuBankEmp.UpdateImps:
                                 Console.WriteLine("Enter Updated Same IMPS");
                                 int updatedSameImps;
                                 string sameImpsInput= Console.ReadLine();
@@ -413,19 +404,19 @@ namespace BankStimulation
                                
                                 
 
-                            case MenuBankEmp.ViewTransactionHistory:
+                            case Enums.MenuBankEmp.ViewTransactionHistory:
                                 Console.WriteLine("Enter account Number");
                                 accNum = Console.ReadLine();
                                 if(accHolderService.ValidateAccNum(accNum))
                                 {
                                     if (bankEmployeeService.ViewTransectionHistory(accNum).Any())
                                     {
-                                        foreach(Transactions item in bankEmployeeService.ViewTransectionHistory(accNum))
+                                        foreach(Transaction item in bankEmployeeService.ViewTransectionHistory(accNum))
                                         {
-                                            Console.WriteLine("Transaction Number:-" + item.transectionNum);
-                                            Console.WriteLine("Transaction Amount:-" + item.transactionAmount);
-                                            Console.WriteLine("Recievers Account Number:-" + item.recieversAccNum);
-                                            Console.WriteLine("Recievers Bank Id:-" + item.sendersBankId);
+                                            Console.WriteLine("Transaction Number:-" + item.TransectionNum);
+                                            Console.WriteLine("Transaction Amount:-" + item.TransactionAmount);
+                                            Console.WriteLine("Recievers Account Number:-" + item.RecieversAccNum);
+                                            Console.WriteLine("Recievers Bank Id:-" + item.SendersBankId);
                                         }
                                         break;
                                     }
@@ -444,7 +435,7 @@ namespace BankStimulation
                                 }
                                 
 
-                            case MenuBankEmp.RevertTransaction:
+                            case Enums.MenuBankEmp.RevertTransaction:
                                 Console.WriteLine("Enter Transaction Number");
                                 string transactionNum = Console.ReadLine();
                                 if (bankingService.ValidateTransactionNumber(transactionNum))
@@ -467,17 +458,17 @@ namespace BankStimulation
                                 }
                                 
 
-                            case MenuBankEmp.DisplayAccdetails:
+                            case Enums.MenuBankEmp.DisplayAccdetails:
                                 Console.WriteLine("Enter Account number ");
                                 accNum = Console.ReadLine();
                                 if (accHolderService.ValidateAccNum(accNum))
                                 {
                                     AccountHolder accountDetail = new AccountHolder();
                                     accountDetail = bankEmployeeService.DisplayAccountDetails(accNum);
-                                    Console.WriteLine("Account Number :-" + accountDetail.accNumber);
-                                    Console.WriteLine("Account Holder Name :-" + accountDetail.accHolderName);
+                                    Console.WriteLine("Account Number :-" + accountDetail.AccNumber);
+                                    Console.WriteLine("Account Holder Name :-" + accountDetail.AccHolderName);
                                     Console.WriteLine("Account Balance :-" + accountDetail.AccountBalance);
-                                    Console.WriteLine("BankId :-" + accountDetail.bankId);
+                                    Console.WriteLine("BankId :-" + accountDetail.BankId);
                                     break;
                                 }
                                 else
@@ -487,7 +478,7 @@ namespace BankStimulation
                                 }
                                 
 
-                            case MenuBankEmp.Exit:
+                            case Enums.MenuBankEmp.Exit:
                                 exit = true;
                                 break;
                         }

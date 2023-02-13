@@ -12,23 +12,23 @@ namespace BankStimulation.Services
     {
         static public Bank yesBank = new Bank()
         {
-            bankId = "yes100223" ,
-            sameRtgs = 0,
-            sameImps = 5,
-            otherRtgs = 2,
-            otherImps = 6,
-            currency = "INR",
-            currencyExchangeRates = "1"
+            BankId = "yes100223" ,
+            SameRtgsCharges = 0,
+            SameImpsCharges = 5,
+            OtherRtgsCharges = 2,
+            OtherImpsCharges = 6,
+            DefaultCurrency = "INR",
+            CurrencyExchangeRates = "1"
         };
 
-        static public List<Transactions> transactions = new List<Transactions>();     
+        static public List<Model.Transaction> Transactions = new List<Model.Transaction>();     
 
         public bool SetCurrency(string currency, string currencyExchangeRates)
         {
             if(currency!=null && currencyExchangeRates != null)
             {
-                yesBank.currency = currency;
-                yesBank.currencyExchangeRates = currencyExchangeRates;
+                yesBank.DefaultCurrency = currency;
+                yesBank.CurrencyExchangeRates = currencyExchangeRates;
                 return true;
             }
             else
@@ -41,8 +41,8 @@ namespace BankStimulation.Services
         {
             if (sameRtgs != null && otherRtgs != null)
             {
-                yesBank.otherRtgs = otherRtgs;
-                yesBank.sameRtgs = sameRtgs;
+                yesBank.OtherRtgsCharges = otherRtgs;
+                yesBank.SameRtgsCharges = sameRtgs;
                 return true;
             }
             else
@@ -55,8 +55,8 @@ namespace BankStimulation.Services
         {
             if (sameImps != null && otherImps != null)
             {
-                yesBank.otherImps = otherImps;
-                yesBank.sameImps = sameImps;
+                yesBank.OtherImpsCharges = otherImps;
+                yesBank.SameImpsCharges = sameImps;
                 return true;
             }
             else
@@ -67,7 +67,7 @@ namespace BankStimulation.Services
 
         public bool ValidateTransactionNumber(string txnNum)
         {
-            if (transactions.Any(txn => txn.transectionNum == txnNum))
+            if (Transactions.Any(txn => txn.TransectionNum == txnNum))
             {
                 return true;
             }

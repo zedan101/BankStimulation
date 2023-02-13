@@ -8,13 +8,13 @@ namespace BankStimulation.Model
 {
     public class Bank
     {
-       public string bankId;
-       public double sameRtgs;
-       public double sameImps;
-       public double otherRtgs;
-       public double otherImps;
-       public string currency;
-       public string currencyExchangeRates;
+       public string BankId;
+       public double SameRtgsCharges;
+       public double SameImpsCharges;
+       public double OtherRtgsCharges;
+       public double OtherImpsCharges;
+       public string DefaultCurrency;
+       public string CurrencyExchangeRates;
 
     }
 }

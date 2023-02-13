@@ -2,10 +2,10 @@
 {
     public class AccountHolder
     {
-       public string accHolderName;
-       public string accNumber;
+       public string AccHolderName;
+       public string AccNumber;
        string _accPin;
-       public string bankId;
+       public string BankId;
        double _accountBalance;
 
         public double AccountBalance

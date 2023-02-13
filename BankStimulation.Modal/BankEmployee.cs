@@ -8,9 +8,9 @@ namespace BankStimulation.Model
 {
     public class BankEmployee
     {
-        public string empId;
+        public string EmpId;
         string _password;
-        public string empName;
+        public string EmpName;
 
         public string Password
         {
