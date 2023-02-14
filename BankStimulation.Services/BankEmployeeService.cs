@@ -87,14 +87,15 @@ namespace BankStimulation.Services
         {
             
             var transactionToRevert = GlobalDataStorage.Transactions.FirstOrDefault(txnToRevert => txnToRevert.TransectionNum == txnNum);
-            if (transactionToRevert.TransactionType == "RTGS") 
+            if (transactionToRevert.TransactionType == Enums.TransferType.RTGS) 
             {
                 if (transactionToRevert.SendersBankId == transactionToRevert.RecieversBankId)
                 {
                     var senderAccToRevertTxn = GlobalDataStorage.AccHolder.FirstOrDefault(accToRvrtTxn => accToRvrtTxn.AccNumber == transactionToRevert.SenderAccNum);
                     var recieverAccToRevertTxn = GlobalDataStorage.AccHolder.FirstOrDefault(accToRvrtTxn => accToRvrtTxn.AccNumber == transactionToRevert.RecieversAccNum);
                     recieverAccToRevertTxn.AccountBalance -= transactionToRevert.TransactionAmount;
-                    transactionToRevert.TransactionStatus = "Pending";
+                    senderAccToRevertTxn.AccountBalance += transactionToRevert.TransactionAmount;
+                    transactionToRevert.TransactionStatus = Enums.TransactionStatus.Success;
                     return true;
                 }
                 else
@@ -102,7 +103,7 @@ namespace BankStimulation.Services
                     if (transactionToRevert.SendersBankId == GlobalDataStorage.yesBank.BankId)
                     {
                         var accToRevertTxn = GlobalDataStorage.AccHolder.FirstOrDefault(accToRvrtTxn => accToRvrtTxn.AccNumber == transactionToRevert.SenderAccNum);
-                        transactionToRevert.TransactionStatus = "Pending";
+                        transactionToRevert.TransactionStatus = Enums.TransactionStatus.Pending;
                         return true;
 
                     }
@@ -110,7 +111,7 @@ namespace BankStimulation.Services
                     {
                         var accToRevertTxn = GlobalDataStorage.AccHolder.FirstOrDefault(accToRvrtTxn => accToRvrtTxn.AccNumber == transactionToRevert.RecieversAccNum);
                         accToRevertTxn.AccountBalance -= transactionToRevert.TransactionAmount;
-                        transactionToRevert.TransactionStatus = "Pending";
+                        transactionToRevert.TransactionStatus = Enums.TransactionStatus.Pending;
                         return true;
                     }
                     else
@@ -128,6 +129,7 @@ namespace BankStimulation.Services
                     var recieverAccToRevertTxn = GlobalDataStorage.AccHolder.FirstOrDefault(accToRvrtTxn => accToRvrtTxn.AccNumber == transactionToRevert.RecieversAccNum);
                     senderAccToRevertTxn.AccountBalance += transactionToRevert.TransactionAmount;
                     recieverAccToRevertTxn.AccountBalance -= transactionToRevert.TransactionAmount;
+                    transactionToRevert.TransactionStatus = Enums.TransactionStatus.Success;
                     return true;    
                 }
                 else
@@ -136,12 +138,14 @@ namespace BankStimulation.Services
                     {
                         var accToRevertTxn = GlobalDataStorage.AccHolder.FirstOrDefault(accToRvrtTxn => accToRvrtTxn.AccNumber == transactionToRevert.SenderAccNum);
                         accToRevertTxn.AccountBalance += transactionToRevert.TransactionAmount;
+                        transactionToRevert.TransactionStatus = Enums.TransactionStatus.Success;
                         return true;
 
                     }
                     else if(transactionToRevert.RecieversBankId == GlobalDataStorage.yesBank.BankId){
                         var accToRevertTxn = GlobalDataStorage.AccHolder.FirstOrDefault(accToRvrtTxn => accToRvrtTxn.AccNumber == transactionToRevert.RecieversAccNum);
                         accToRevertTxn.AccountBalance -= transactionToRevert.TransactionAmount;
+                        transactionToRevert.TransactionStatus = Enums.TransactionStatus.Success;
                         return true;
                     }
                     else

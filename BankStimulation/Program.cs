@@ -13,14 +13,15 @@ namespace BankStimulation
             bool exit = false;
             do
             {
-                Console.WriteLine("For Bank Employee LogIn Enter 0");
-                Console.WriteLine("For Account Holder LogIn Enter 1");
+                Console.WriteLine("To exist enter " + (int)Enums.LogInType.Exit);
+                Console.WriteLine("For Bank Employee LogIn Enter " + (int)Enums.LogInType.BankEmployeeLogIn);
+                Console.WriteLine("For Account Holder LogIn Enter " + (int)Enums.LogInType.AccountHolderLogIn);
                 try 
                 {
                     int input;
                     if(int.TryParse(Console.ReadLine(), out input))
                     {
-                        if (input == 0)
+                        if ((int)Enums.LogInType.BankEmployeeLogIn == input)
                         {
                             Console.WriteLine("Enter Employee Id");
                             string empId = Console.ReadLine();
@@ -37,22 +38,22 @@ namespace BankStimulation
                             }
 
                         }
-                        else if (input == 1)
+                        else if ((int)Enums.LogInType.AccountHolderLogIn == input)
                         {
                             Console.WriteLine("Enter Account Number");
                             string accNum = Console.ReadLine();
                             Console.WriteLine("Enter Password");
                             string accPin = Console.ReadLine();
-                            if (accHolderService.ValidateAccNum(accNum) && accHolderService.ValidateAccPin(accPin))
+                            if (accHolderService.ValidateAccHolder(accPin , accNum))
                             {
                                 UiAccountHolder();
                             }
                             else
                             {
-                                Console.WriteLine("Invalid Id");
+                                Console.WriteLine("Invalid Credentials");
                             }
                         }
-                        else if (input == 0)
+                        else if ((int)Enums.LogInType.Exit == input)
                         {
                             exit = true;
                         }
@@ -146,22 +147,9 @@ namespace BankStimulation
                                         try
                                         {
                                             input = Int32.Parse(Console.ReadLine());
-
-                                            if (input == 1)
-                                            {
-                                                IsSuccess(accHolderService.TransferFundsRtgs(amount, rcvAccNum, rcvBankId));
-                                                break;
-                                            }
-                                            else if (input == 2)
-                                            {
-                                                IsSuccess(accHolderService.TransferFundImps(amount, rcvAccNum, rcvBankId));
-                                                break;
-                                            }
-                                            else
-                                            {
-                                                Console.WriteLine("Please Enter Valid Option");
-                                                break;
-                                            }
+                                            IsSuccess(accHolderService.TransferFunds(amount, rcvAccNum, rcvBankId,input==1?Enums.TransferType.RTGS:Enums.TransferType.IMPS));
+                                            break;
+                                            
                                         }
                                         catch (FormatException)
                                         {

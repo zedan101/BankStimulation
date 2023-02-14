@@ -41,12 +41,7 @@ namespace BankStimulation.Services
 
         }
 
-        public bool setTransection(double Charges)
-        {
-
-        }
-
-        public bool TransferFundImps(double amount, string recieverAccNum, string recieverBankId)
+        public bool TransferFunds(double amount, string recieverAccNum, string recieverBankId,Enums.TransferType transferType)
         {
             var accHldr = GlobalDataStorage.AccHolder.FirstOrDefault(accHldr => accHldr.AccNumber == loggedInUserAccNum);
             if (accHldr.AccountBalance >= amount && amount != 0)
@@ -57,18 +52,22 @@ namespace BankStimulation.Services
                 newTransaction.RecieversAccNum = recieverAccNum;
                 newTransaction.SenderAccNum = accHldr.AccNumber;
                 newTransaction.TransactionAmount = amount;
-                newTransaction.TransactionType = "IMPS";
+                newTransaction.TransactionType = transferType;
                 newTransaction.TransectionNum = "TXN" + accHldr.BankId + accHldr.AccNumber + DateTime.Now.ToString("ddMMyyyy");
-                newTransaction.TransactionStatus = "Success";
-                if (recieverBankId == GlobalDataStorage.yesBank.BankId)
+                
+                accHldr.AccountBalance -= (amount + amount * GetCharges(transferType.ToString(), recieverBankId == GlobalDataStorage.yesBank.BankId) / 100);
+                if (transferType.ToString() == "IMPS")
                 {
-                    accHldr.AccountBalance -= (amount + amount * GlobalDataStorage.yesBank.SameImpsCharges / 100);
-                  
+                    if(recieverBankId == GlobalDataStorage.yesBank.BankId)
+                    {
+                        GlobalDataStorage.AccHolder.FirstOrDefault(accHldr => accHldr.AccNumber == recieverAccNum).AccountBalance += amount;
+                    }
+                    newTransaction.TransactionStatus = Enums.TransactionStatus.Success;
+
                 }
                 else
                 {
-                    accHldr.AccountBalance -= (amount + amount * GlobalDataStorage.yesBank.OtherImpsCharges / 100);
-                    
+                    newTransaction.TransactionStatus = Enums.TransactionStatus.Pending;
                 }
                 GlobalDataStorage.Transactions.Add(newTransaction);
                 return true;
@@ -79,37 +78,29 @@ namespace BankStimulation.Services
             }
         }
 
-        public bool TransferFundsRtgs(double amount , string recieverAccNum,string recieverBankId)
+        double GetCharges(string transferType,bool isSameBank)
         {
-            var accHldr = GlobalDataStorage.AccHolder.FirstOrDefault(accHldr => accHldr.AccNumber == loggedInUserAccNum);
-            if (accHldr.AccountBalance >= amount && amount != 0)
+            if (transferType == "RTGS")
             {
-
-                Transaction newTransaction = new Transaction();
-                newTransaction.SendersBankId = accHldr.BankId;
-                newTransaction.RecieversBankId = recieverBankId;
-                newTransaction.RecieversAccNum = recieverAccNum;
-                newTransaction.SenderAccNum = accHldr.AccNumber;
-                newTransaction.TransactionAmount = amount;
-                newTransaction.TransactionType = "RTGS";
-                newTransaction.TransectionNum = "TXN" + accHldr.BankId + accHldr.AccNumber + DateTime.Now.ToString("ddMMyyyy");
-                newTransaction.TransactionStatus = "Pending";
-                if (recieverBankId == GlobalDataStorage.yesBank.BankId)
+                if (isSameBank)
                 {
-                    accHldr.AccountBalance -= (amount + amount * GlobalDataStorage.yesBank.SameRtgsCharges/100);
-                    
+                    return GlobalDataStorage.yesBank.SameRtgsCharges;
                 }
                 else
                 {
-                    accHldr.AccountBalance -= (amount + amount * GlobalDataStorage.yesBank.OtherRtgsCharges / 100);
-                 
+                    return GlobalDataStorage.yesBank.OtherRtgsCharges;
                 }
-                GlobalDataStorage.Transactions.Add(newTransaction);
-                return true;
             }
             else
             {
-                return false;
+                if (isSameBank)
+                {
+                    return GlobalDataStorage.yesBank.SameImpsCharges;
+                }
+                else
+                {
+                    return GlobalDataStorage.yesBank.OtherImpsCharges;
+                }
             }
         }
 
@@ -136,21 +127,14 @@ namespace BankStimulation.Services
 
         public bool ValidateAccNum(string accNum)
         {
-            if (GlobalDataStorage.AccHolder.Any(accHldr => accHldr.AccNumber == accNum))
-            {
-                loggedInUserAccNum= accNum;
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return GlobalDataStorage.AccHolder.Any(accHldr => accHldr.AccNumber == accNum);
         }
 
-        public bool ValidateAccPin(string accPin)
+        public bool ValidateAccHolder(string accPin , string accNum)
         {
-            if (GlobalDataStorage.AccHolder.Any(accHldr => accHldr.AccPin == accPin))
+            if (GlobalDataStorage.AccHolder.Any(accHldr =>accHldr.AccPin == accPin) && GlobalDataStorage.AccHolder.Any(accHldr => accHldr.AccNumber == accNum))
             {
+                loggedInUserAccNum = accNum;
                 return true;
             }
             else

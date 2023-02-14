@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BankStimulation
 {
-    internal class Enums
+    public class Enums
     {
 
         public enum MenuAccHolder
@@ -16,6 +16,21 @@ namespace BankStimulation
         public enum MenuBankEmp
         {
             Exit, CreateNewAcc, UpdateBankAccount, UpdateCurrency, UpdateRtgs, UpdateImps, ViewTransactionHistory, RevertTransaction, DisplayAccdetails
+        }
+
+        public enum LogInType
+        {
+            Exit , BankEmployeeLogIn , AccountHolderLogIn
+        }
+
+        public enum TransactionStatus
+        {
+            Success , Pending , Failed
+        }
+
+        public enum TransferType
+        {
+            RTGS , IMPS
         }
 
     }
