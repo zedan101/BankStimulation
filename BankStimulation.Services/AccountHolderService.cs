@@ -41,97 +41,75 @@ namespace BankStimulation.Services
 
         }
 
+        public bool setTransection(double Charges)
+        {
+
+        }
+
         public bool TransferFundImps(double amount, string recieverAccNum, string recieverBankId)
         {
             var accHldr = GlobalDataStorage.AccHolder.FirstOrDefault(accHldr => accHldr.AccNumber == loggedInUserAccNum);
-            if (recieverBankId == GlobalDataStorage.yesBank.BankId)
+            if (accHldr.AccountBalance >= amount && amount != 0)
             {
-                if (accHldr.AccountBalance >= amount && amount != 0)
+                Transaction newTransaction = new Transaction();
+                newTransaction.SendersBankId = accHldr.BankId;
+                newTransaction.RecieversBankId = recieverBankId;
+                newTransaction.RecieversAccNum = recieverAccNum;
+                newTransaction.SenderAccNum = accHldr.AccNumber;
+                newTransaction.TransactionAmount = amount;
+                newTransaction.TransactionType = "IMPS";
+                newTransaction.TransectionNum = "TXN" + accHldr.BankId + accHldr.AccNumber + DateTime.Now.ToString("ddMMyyyy");
+                newTransaction.TransactionStatus = "Success";
+                if (recieverBankId == GlobalDataStorage.yesBank.BankId)
                 {
-                    Transaction newTransaction = new Transaction();
-                    newTransaction.SendersBankId = accHldr.BankId;
-                    newTransaction.RecieversBankId = recieverBankId;
-                    newTransaction.RecieversAccNum = recieverAccNum;
-                    newTransaction.SenderAccNum = accHldr.AccNumber;
-                    newTransaction.TransactionAmount = amount;
-                    newTransaction.TransactionType = "IMPS";
-                    newTransaction.TransectionNum = "TXN" + accHldr.BankId + accHldr.AccNumber + DateTime.Now.ToString("ddMMyyyy");
                     accHldr.AccountBalance -= (amount + amount * GlobalDataStorage.yesBank.SameImpsCharges / 100);
-                    newTransaction.TransactionStatus = "Success";
-                    return true;
+                  
                 }
                 else
                 {
-                    return false;
+                    accHldr.AccountBalance -= (amount + amount * GlobalDataStorage.yesBank.OtherImpsCharges / 100);
+                    
                 }
+                GlobalDataStorage.Transactions.Add(newTransaction);
+                return true;
             }
             else
             {
-                if (accHldr.AccountBalance >= amount && amount != 0)
-                {
-                    Transaction newTransaction = new Transaction();
-                    newTransaction.SendersBankId = accHldr.BankId;
-                    newTransaction.RecieversBankId = recieverBankId;
-                    newTransaction.RecieversAccNum = recieverAccNum;
-                    newTransaction.SenderAccNum = accHldr.AccNumber;
-                    newTransaction.TransactionAmount = amount;
-                    newTransaction.TransactionType = "IMPS";
-                    newTransaction.TransectionNum = "TXN" + accHldr.BankId + accHldr.AccNumber + DateTime.Now.ToString("ddMMyyyy");
-                    accHldr.AccountBalance -= (amount + amount * GlobalDataStorage.yesBank.OtherImpsCharges / 100);
-                    newTransaction.TransactionStatus = "Success";
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
+                return false;
             }
         }
 
         public bool TransferFundsRtgs(double amount , string recieverAccNum,string recieverBankId)
         {
             var accHldr = GlobalDataStorage.AccHolder.FirstOrDefault(accHldr => accHldr.AccNumber == loggedInUserAccNum);
-            if (recieverBankId == GlobalDataStorage.yesBank.BankId)
+            if (accHldr.AccountBalance >= amount && amount != 0)
             {
-                if (accHldr.AccountBalance >= amount && amount != 0)
+
+                Transaction newTransaction = new Transaction();
+                newTransaction.SendersBankId = accHldr.BankId;
+                newTransaction.RecieversBankId = recieverBankId;
+                newTransaction.RecieversAccNum = recieverAccNum;
+                newTransaction.SenderAccNum = accHldr.AccNumber;
+                newTransaction.TransactionAmount = amount;
+                newTransaction.TransactionType = "RTGS";
+                newTransaction.TransectionNum = "TXN" + accHldr.BankId + accHldr.AccNumber + DateTime.Now.ToString("ddMMyyyy");
+                newTransaction.TransactionStatus = "Pending";
+                if (recieverBankId == GlobalDataStorage.yesBank.BankId)
                 {
-                    Transaction newTransaction = new Transaction();
-                    newTransaction.SendersBankId = accHldr.BankId;
-                    newTransaction.RecieversBankId = recieverBankId;
-                    newTransaction.RecieversAccNum = recieverAccNum;
-                    newTransaction.SenderAccNum = accHldr.AccNumber;
-                    newTransaction.TransactionAmount = amount;
-                    newTransaction.TransactionType = "RTGS";
-                    newTransaction.TransectionNum = "TXN" + accHldr.BankId + accHldr.AccNumber + DateTime.Now.ToString("ddMMyyyy");
                     accHldr.AccountBalance -= (amount + amount * GlobalDataStorage.yesBank.SameRtgsCharges/100);
-                    newTransaction.TransactionStatus = "Pending";
-                    return true;
+                    
                 }
                 else
                 {
-                    return false;
+                    accHldr.AccountBalance -= (amount + amount * GlobalDataStorage.yesBank.OtherRtgsCharges / 100);
+                 
                 }
+                GlobalDataStorage.Transactions.Add(newTransaction);
+                return true;
             }
             else
             {
-                if (accHldr.AccountBalance >= amount && amount != 0)
-                {
-                    Transaction newTransaction = new Transaction();
-                    newTransaction.SendersBankId = accHldr.BankId;
-                    newTransaction.RecieversBankId = recieverBankId;
-                    newTransaction.RecieversAccNum = recieverAccNum;
-                    newTransaction.SenderAccNum = accHldr.AccNumber;
-                    newTransaction.TransactionAmount = amount;
-                    newTransaction.TransactionType = "RTGS";
-                    newTransaction.TransectionNum = "TXN" + accHldr.BankId + accHldr.AccNumber + DateTime.Now.ToString("ddMMyyyy");
-                    accHldr.AccountBalance -= (amount + amount * GlobalDataStorage.yesBank.OtherRtgsCharges / 100);
-                    newTransaction.TransactionStatus = "Pending";
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
+                return false;
             }
         }
 
