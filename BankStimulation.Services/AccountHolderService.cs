@@ -111,7 +111,7 @@ namespace BankStimulation.Services
             return txn;
         }
 
-        public bool SetAccHolderData(AccountHolder accountHolder)
+        public bool SetAccHolderData(Accounts accountHolder)
         {
             if(accountHolder!=null)
             {
@@ -132,7 +132,7 @@ namespace BankStimulation.Services
 
         public bool ValidateAccHolder(string accPin , string accNum)
         {
-            if (GlobalDataStorage.AccHolder.Any(accHldr =>accHldr.AccPin == accPin) && GlobalDataStorage.AccHolder.Any(accHldr => accHldr.AccNumber == accNum))
+            if (GlobalDataStorage.AccHolder.Any(accHldr =>accHldr.Password == accPin && accHldr.AccNumber == accNum))
             {
                 loggedInUserAccNum = accNum;
                 return true;

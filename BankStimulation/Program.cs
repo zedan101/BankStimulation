@@ -19,9 +19,9 @@ namespace BankStimulation
                 try 
                 {
                     int input;
-                    if(int.TryParse(Console.ReadLine(), out input))
+                    if(int.TryParse(Console.ReadLine(),out input))
                     {
-                        if ((int)Enums.LogInType.BankEmployeeLogIn == input)
+                        if (Enums.LogInType.BankEmployeeLogIn == (Enums.LogInType)input)
                         {
                             Console.WriteLine("Enter Employee Id");
                             string empId = Console.ReadLine();
@@ -38,7 +38,7 @@ namespace BankStimulation
                             }
 
                         }
-                        else if ((int)Enums.LogInType.AccountHolderLogIn == input)
+                        else if (Enums.LogInType.AccountHolderLogIn == (Enums.LogInType)input)
                         {
                             Console.WriteLine("Enter Account Number");
                             string accNum = Console.ReadLine();
@@ -53,7 +53,7 @@ namespace BankStimulation
                                 Console.WriteLine("Invalid Credentials");
                             }
                         }
-                        else if ((int)Enums.LogInType.Exit == input)
+                        else if (Enums.LogInType.Exit == (Enums.LogInType)input)
                         {
                             exit = true;
                         }
@@ -231,11 +231,11 @@ namespace BankStimulation
                         switch ((Enums.MenuBankEmp)input)
                         {
                             case Enums.MenuBankEmp.CreateNewAcc:
-                                AccountHolder accHolder = new ();
+                                Accounts accHolder = new ();
                                 Console.WriteLine("Enter Account Holder Name");
-                                accHolder.AccHolderName = Console.ReadLine();
+                                accHolder.UserName = Console.ReadLine();
                                 Console.WriteLine("Enter Pin");
-                                accHolder.AccPin = Console.ReadLine();
+                                accHolder.Password = Console.ReadLine();
                                 Console.WriteLine("Enter Initial Account balance");
                                 string amtInput = Console.ReadLine();
                                 double amount;
@@ -245,7 +245,7 @@ namespace BankStimulation
                                 {
                                     if (double.TryParse(amtInput, out amount) && amount>0)
                                     {
-                                        accHolder.AccNumber = accHolder.AccHolderName.Substring(0, 3) + DateTime.Now.ToString("ddMMyyyy");
+                                        accHolder.AccNumber = accHolder.UserName.Substring(0, 3) + DateTime.Now.ToString("ddMMyyyy");
                                         accHolder.AccountBalance = amount * GlobalDataStorage.AcceptedCurrency.FirstOrDefault(e => e.AcceptedCurrency == currency).ExchangeRate;
                                         accHolder.BankId = GlobalDataStorage.yesBank.BankId;
                                         IsSuccess(bankEmployeeService.CreatNewAccount(accHolder));
@@ -401,10 +401,10 @@ namespace BankStimulation
                                 accNum = Console.ReadLine();
                                 if (accHolderService.ValidateAccNum(accNum))
                                 {
-                                    AccountHolder accountDetail = new AccountHolder();
+                                    Accounts accountDetail = new Accounts();
                                     accountDetail = bankEmployeeService.DisplayAccountDetails(accNum);
                                     Console.WriteLine("Account Number :-" + accountDetail.AccNumber);
-                                    Console.WriteLine("Account Holder Name :-" + accountDetail.AccHolderName);
+                                    Console.WriteLine("Account Holder Name :-" + accountDetail.UserName);
                                     Console.WriteLine("Account Balance :-" + accountDetail.AccountBalance);
                                     Console.WriteLine("BankId :-" + accountDetail.BankId);
                                     break;

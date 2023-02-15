@@ -9,12 +9,12 @@ namespace BankStimulation.Services
         AccountHolderService _accHldrService = new AccountHolderService();
         BankingService _bankingService= new BankingService();
 
-        public AccountHolder DisplayAccountDetails(string accNum)
+        public Accounts DisplayAccountDetails(string accNum)
         {
             return GlobalDataStorage.AccHolder.FirstOrDefault(e => e.AccNumber == accNum);
         }
 
-        public bool CreatNewAccount(AccountHolder accHolder)
+        public bool CreatNewAccount(Accounts accHolder)
         {
            
            if (_accHldrService.SetAccHolderData(accHolder))
@@ -36,11 +36,11 @@ namespace BankStimulation.Services
             {
                 if(accHldrName != null)
                 {
-                    currentDetails.AccHolderName = accHldrName;
+                    currentDetails.UserName = accHldrName;
                 }
                 if(accPin != null)
                 {
-                    currentDetails.AccPin = accPin;
+                    currentDetails.Password = accPin;
                 }
 
                 return true;
@@ -158,7 +158,7 @@ namespace BankStimulation.Services
 
         public bool ValidateEmpCredentials(string empId, string empPass)
          {
-            if (GlobalDataStorage.BankEmp.Any(bnkEmp => bnkEmp.EmpId == empId && bnkEmp.Password == empPass))
+            if (GlobalDataStorage.BankEmp.Any(bnkEmp => bnkEmp.UserId == empId && bnkEmp.Password == empPass))
             {
                 return true;
             }
