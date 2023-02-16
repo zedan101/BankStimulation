@@ -1,15 +1,11 @@
 ﻿using BankStimulation.Model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BankStimulation.Services
 {
     public class AccountHolderService
     {
         string loggedInUserAccNum;
+        string loggedInUserbankId;
 
         public bool DepositeFund(double amount)
         {
@@ -55,10 +51,10 @@ namespace BankStimulation.Services
                 newTransaction.TransactionType = transferType;
                 newTransaction.TransectionNum = "TXN" + accHldr.BankId + accHldr.AccNumber + DateTime.Now.ToString("ddMMyyyy");
                 
-                accHldr.AccountBalance -= (amount + amount * GetCharges(transferType.ToString(), recieverBankId == GlobalDataStorage.yesBank.BankId) / 100);
+                accHldr.AccountBalance -= (amount + amount * GetCharges(transferType.ToString(), recieverBankId == loggedInUserbankId) / 100);
                 if (transferType.ToString() == "IMPS")
                 {
-                    if(recieverBankId == GlobalDataStorage.yesBank.BankId)
+                    if(recieverBankId == loggedInUserbankId)
                     {
                         GlobalDataStorage.AccHolder.FirstOrDefault(accHldr => accHldr.AccNumber == recieverAccNum).AccountBalance += amount;
                     }
@@ -84,22 +80,22 @@ namespace BankStimulation.Services
             {
                 if (isSameBank)
                 {
-                    return GlobalDataStorage.yesBank.SameRtgsCharges;
+                    return GlobalDataStorage.Banks.FirstOrDefault(bank => bank.BankId == loggedInUserbankId).SameRtgsCharges;
                 }
                 else
                 {
-                    return GlobalDataStorage.yesBank.OtherRtgsCharges;
+                    return GlobalDataStorage.Banks.FirstOrDefault(bank => bank.BankId == loggedInUserbankId).OtherRtgsCharges;
                 }
             }
             else
             {
                 if (isSameBank)
                 {
-                    return GlobalDataStorage.yesBank.SameImpsCharges;
+                    return GlobalDataStorage.Banks.FirstOrDefault(bank => bank.BankId == loggedInUserbankId).SameImpsCharges;
                 }
                 else
                 {
-                    return GlobalDataStorage.yesBank.OtherImpsCharges;
+                    return GlobalDataStorage.Banks.FirstOrDefault(bank => bank.BankId == loggedInUserbankId).OtherImpsCharges;
                 }
             }
         }
@@ -132,9 +128,11 @@ namespace BankStimulation.Services
 
         public bool ValidateAccHolder(string accPin , string accNum)
         {
-            if (GlobalDataStorage.AccHolder.Any(accHldr =>accHldr.Password == accPin && accHldr.AccNumber == accNum))
+            var validateCred = GlobalDataStorage.AccHolder.FirstOrDefault(accHldr => accHldr.Password == accPin && accHldr.AccNumber == accNum);
+            if (validateCred != null)
             {
                 loggedInUserAccNum = accNum;
+                loggedInUserbankId = validateCred.BankId;
                 return true;
             }
             else

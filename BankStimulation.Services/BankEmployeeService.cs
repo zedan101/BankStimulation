@@ -1,11 +1,11 @@
 ﻿using BankStimulation.Model;
-using System.Net.Sockets;
+
 
 namespace BankStimulation.Services
 {
     public class BankEmployeeService
     {
-
+        string currentBankId;
         AccountHolderService _accHldrService = new AccountHolderService();
         BankingService _bankingService= new BankingService();
 
@@ -55,7 +55,7 @@ namespace BankStimulation.Services
         {
             if (updatedCurrency.AcceptedCurrency != null && updatedCurrency.ExchangeRate != 0)
             {
-                GlobalDataStorage.AcceptedCurrency.Add(updatedCurrency);
+                GlobalDataStorage.Banks.FirstOrDefault(bank => bank.BankId == currentBankId).AcceptedCurrency.Add(updatedCurrency);
                 return true;
             }
             else
@@ -64,15 +64,15 @@ namespace BankStimulation.Services
             }
         }
 
-        public bool UpdateRtgs(double updatedSameRtgs,double updatedOtherRtgs)
+        public bool UpdateRtgs(double updatedSameRtgs,double updatedOtherRtgs )
         {
-            return _bankingService.SetRtgs(updatedSameRtgs, updatedOtherRtgs);
+            return _bankingService.SetRtgs(updatedSameRtgs, updatedOtherRtgs , currentBankId);
             
         }
 
         public bool UpdateImps(double updatedSameImps, double updatedOtherImps)
         {
-           return _bankingService.SetImps(updatedSameImps, updatedOtherImps);
+           return _bankingService.SetImps(updatedSameImps, updatedOtherImps , currentBankId);
             
         }
 
@@ -100,14 +100,14 @@ namespace BankStimulation.Services
                 }
                 else
                 {
-                    if (transactionToRevert.SendersBankId == GlobalDataStorage.yesBank.BankId)
+                    if (transactionToRevert.SendersBankId == currentBankId)
                     {
                         var accToRevertTxn = GlobalDataStorage.AccHolder.FirstOrDefault(accToRvrtTxn => accToRvrtTxn.AccNumber == transactionToRevert.SenderAccNum);
                         transactionToRevert.TransactionStatus = Enums.TransactionStatus.Pending;
                         return true;
 
                     }
-                    else if (transactionToRevert.RecieversBankId == GlobalDataStorage.yesBank.BankId)
+                    else if (transactionToRevert.RecieversBankId == currentBankId)
                     {
                         var accToRevertTxn = GlobalDataStorage.AccHolder.FirstOrDefault(accToRvrtTxn => accToRvrtTxn.AccNumber == transactionToRevert.RecieversAccNum);
                         accToRevertTxn.AccountBalance -= transactionToRevert.TransactionAmount;
@@ -134,7 +134,7 @@ namespace BankStimulation.Services
                 }
                 else
                 {
-                    if(transactionToRevert.SendersBankId == GlobalDataStorage.yesBank.BankId)
+                    if(transactionToRevert.SendersBankId == currentBankId)
                     {
                         var accToRevertTxn = GlobalDataStorage.AccHolder.FirstOrDefault(accToRvrtTxn => accToRvrtTxn.AccNumber == transactionToRevert.SenderAccNum);
                         accToRevertTxn.AccountBalance += transactionToRevert.TransactionAmount;
@@ -142,7 +142,7 @@ namespace BankStimulation.Services
                         return true;
 
                     }
-                    else if(transactionToRevert.RecieversBankId == GlobalDataStorage.yesBank.BankId){
+                    else if(transactionToRevert.RecieversBankId == currentBankId){
                         var accToRevertTxn = GlobalDataStorage.AccHolder.FirstOrDefault(accToRvrtTxn => accToRvrtTxn.AccNumber == transactionToRevert.RecieversAccNum);
                         accToRevertTxn.AccountBalance -= transactionToRevert.TransactionAmount;
                         transactionToRevert.TransactionStatus = Enums.TransactionStatus.Success;
@@ -158,8 +158,10 @@ namespace BankStimulation.Services
 
         public bool ValidateEmpCredentials(string empId, string empPass)
          {
-            if (GlobalDataStorage.BankEmp.Any(bnkEmp => bnkEmp.UserId == empId && bnkEmp.Password == empPass))
+            var validateCred = GlobalDataStorage.BankEmp.FirstOrDefault(bnkEmp => bnkEmp.UserId == empId && bnkEmp.Password == empPass);
+            if (validateCred != null)
             {
+                currentBankId = validateCred.BankId;
                 return true;
             }
             else

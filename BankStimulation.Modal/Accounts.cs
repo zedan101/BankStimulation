@@ -5,7 +5,7 @@
       // public string AccHolderName;
        public string AccNumber;
       // string _accPin;
-      // public string BankId;
+       public string BankId;
        double _accountBalance;
 
         public double AccountBalance

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
 
 namespace BankStimulation
 {
@@ -20,7 +16,7 @@ namespace BankStimulation
 
         public enum LogInType
         {
-            Exit , BankEmployeeLogIn , AccountHolderLogIn
+            Exit , BankEmployeeLogIn , AccountHolderLogIn , SuperAdminLogIn , BankAdminLogIn
         }
 
         public enum TransactionStatus
@@ -33,5 +29,14 @@ namespace BankStimulation
             RTGS , IMPS
         }
 
+        public enum MenuSuperAdmin
+        {
+           Exit , CreateBank , EditBankAdmin , DisplayBankDetails
+        }
+
+        public enum MenuBankAdmin
+        {
+            Exit, AddEmployees , EditEmployees , ApproveTransactions , DisplayEmployeeDetails , DisplayTransactionHistory , DisplayAccountDetails
+        }
     }
 }

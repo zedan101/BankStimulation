@@ -6,6 +6,8 @@ namespace BankStimulation
     {
         static void Main(string[] args)
         {
+            BankAdminService bankAdminService = new BankAdminService();
+            SuperAdminService superAdminService= new SuperAdminService();
             AccountHolderService accHolderService = new AccountHolderService();
             BankEmployeeService bankEmployeeService = new BankEmployeeService();
             BankingService bankingService = new BankingService();
@@ -13,59 +15,94 @@ namespace BankStimulation
             bool exit = false;
             do
             {
+
+                Users user = new();
                 Console.WriteLine("To exist enter " + (int)Enums.LogInType.Exit);
                 Console.WriteLine("For Bank Employee LogIn Enter " + (int)Enums.LogInType.BankEmployeeLogIn);
                 Console.WriteLine("For Account Holder LogIn Enter " + (int)Enums.LogInType.AccountHolderLogIn);
+                Console.WriteLine("For Super Admin LogIn Enter " + (int)Enums.LogInType.SuperAdminLogIn);
+                Console.WriteLine("For Bank Admin LogIn Enter " + (int)Enums.LogInType.BankAdminLogIn);
                 try 
                 {
                     int input;
                     if(int.TryParse(Console.ReadLine(),out input))
                     {
-                        if (Enums.LogInType.BankEmployeeLogIn == (Enums.LogInType)input)
+                        switch ((Enums.LogInType)input)
                         {
-                            Console.WriteLine("Enter Employee Id");
-                            string empId = Console.ReadLine();
-                            Console.WriteLine("Enter Password");
-                            string empPass = Console.ReadLine();
-                            if (bankEmployeeService.ValidateEmpCredentials(empId, empPass))
-                            {
-                                UiBankEmployee();
-                            }
-                            else
-                            {
-                                Console.WriteLine("Invalid Credentials");
+                            case Enums.LogInType.BankEmployeeLogIn:
+                                Console.WriteLine("Enter Employee Id");
+                                user.UserId = Console.ReadLine();
+                                Console.WriteLine("Enter Password");
+                                user.Password = Console.ReadLine();
+                                if (bankEmployeeService.ValidateEmpCredentials(user.UserId, user.Password))
+                                {
+                                    UiBankEmployee(user.UserId);
+                                    break;
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Invalid Credentials");
+                                    break;
 
-                            }
+                                }
 
-                        }
-                        else if (Enums.LogInType.AccountHolderLogIn == (Enums.LogInType)input)
-                        {
-                            Console.WriteLine("Enter Account Number");
-                            string accNum = Console.ReadLine();
-                            Console.WriteLine("Enter Password");
-                            string accPin = Console.ReadLine();
-                            if (accHolderService.ValidateAccHolder(accPin , accNum))
-                            {
-                                UiAccountHolder();
-                            }
-                            else
-                            {
-                                Console.WriteLine("Invalid Credentials");
-                            }
-                        }
-                        else if (Enums.LogInType.Exit == (Enums.LogInType)input)
-                        {
-                            exit = true;
-                        }
-                        else
-                        {
-                            Console.WriteLine("Invalid Input");
+                            case Enums.LogInType.AccountHolderLogIn:
+                                Console.WriteLine("Enter Account Number");
+                                user.UserId = Console.ReadLine();
+                                Console.WriteLine("Enter Password");
+                                user.Password = Console.ReadLine();
+                                if (accHolderService.ValidateAccHolder(user.Password, user.UserId))
+                                {
+                                    UiAccountHolder(user.UserId);
+                                    break;
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Invalid Credentials");
+                                    break;
+                                }
+
+                            case Enums.LogInType.SuperAdminLogIn:
+                                Console.WriteLine("Enter Id");
+                                user.UserId = Console.ReadLine();
+                                Console.WriteLine("Enter Password");
+                                user.Password = Console.ReadLine();
+                                if (bankAdminService.ValidateBankAdmin(user.UserId, user.Password))
+                                {
+                                    UiSuperAdmin();
+                                    break;
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Invalid Credentials");
+                                    break;
+                                }
+
+                            case Enums.LogInType.BankAdminLogIn:
+                                Console.WriteLine("Enter Id");
+                                user.UserId = Console.ReadLine();
+                                Console.WriteLine("Enter Password");
+                                user.Password = Console.ReadLine();
+                                if (bankAdminService.ValidateBankAdmin(user.UserId, user.Password))
+                                {
+                                    UiBankAdmin();
+                                    break;
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Invalid Credentials");
+                                    break;
+                                }
+
+                            case Enums.LogInType.Exit:
+                                exit = true;
+                                break;
                         }
                     }
                     else
                     {
                         throw new InvalidInputException("Invalid Input");
-                    }   
+                    }  
                    
                 }
                 catch (InvalidInputException ex)
@@ -76,8 +113,9 @@ namespace BankStimulation
             }
             while (!exit);
 
-            void UiAccountHolder()
+            void UiAccountHolder(string accNm)
             {
+                string bankId = GlobalDataStorage.AccHolder.FirstOrDefault(acchldr => acchldr.AccNumber == accNm).BankId;
                 bool exit = false;
                 do
                 {
@@ -99,9 +137,9 @@ namespace BankStimulation
                                 try
                                 {
                                     double amount = Convert.ToDouble(Console.ReadLine());
-                                    if (GlobalDataStorage.AcceptedCurrency.Any(e => e.AcceptedCurrency == currency))
+                                    if (GlobalDataStorage.Banks.FirstOrDefault(bank => bank.BankId == bankId).AcceptedCurrency.Any(e => e.AcceptedCurrency == currency))
                                     {
-                                        IsSuccess(accHolderService.DepositeFund(amount * GlobalDataStorage.AcceptedCurrency.FirstOrDefault(e => e.AcceptedCurrency == currency).ExchangeRate));
+                                        IsSuccess(accHolderService.DepositeFund(amount * GlobalDataStorage.Banks.FirstOrDefault(bank => bank.BankId == bankId).AcceptedCurrency.FirstOrDefault(e => e.AcceptedCurrency == currency).ExchangeRate));
                                         break;
                                     }
                                     else
@@ -211,8 +249,9 @@ namespace BankStimulation
                 
 
             }
-            void UiBankEmployee()
-            {
+            void UiBankEmployee(string empId)
+            { 
+                string bankId = GlobalDataStorage.BankEmp.FirstOrDefault(emp => emp.UserId == empId).BankId;
                 bool exit = false;
                 do
                 {
@@ -241,13 +280,13 @@ namespace BankStimulation
                                 double amount;
                                 Console.WriteLine("Enter Currency");
                                 string currency= Console.ReadLine();
-                                if(GlobalDataStorage.AcceptedCurrency.Any(e => e.AcceptedCurrency == currency))
+                                if(GlobalDataStorage.Banks.FirstOrDefault(bank => bank.BankId == bankId).AcceptedCurrency.Any(e => e.AcceptedCurrency == currency))
                                 {
                                     if (double.TryParse(amtInput, out amount) && amount>0)
                                     {
                                         accHolder.AccNumber = accHolder.UserName.Substring(0, 3) + DateTime.Now.ToString("ddMMyyyy");
-                                        accHolder.AccountBalance = amount * GlobalDataStorage.AcceptedCurrency.FirstOrDefault(e => e.AcceptedCurrency == currency).ExchangeRate;
-                                        accHolder.BankId = GlobalDataStorage.yesBank.BankId;
+                                        accHolder.AccountBalance = amount * GlobalDataStorage.Banks.FirstOrDefault(bank => bank.BankId == bankId).AcceptedCurrency.FirstOrDefault(e => e.AcceptedCurrency == currency).ExchangeRate;
+                                        accHolder.BankId = bankId;
                                         IsSuccess(bankEmployeeService.CreatNewAccount(accHolder));
                                         break;
                                     }
@@ -440,6 +479,99 @@ namespace BankStimulation
                 {
                     Console.WriteLine("Unsuccessful");
                 }
+            }
+
+            void UiSuperAdmin()
+            {
+                bool exit = false;
+                do
+                {
+                    Users admin = new ();
+                    Bank bank = new();
+                    Console.WriteLine("\n To Create a New Bank Enter 1");
+                    Console.WriteLine("To Edit Bank Admin Credentials Enter 2");
+                    Console.WriteLine("To Display Bank Details Enter 3");
+                    Console.WriteLine("To Exit Enter 0");
+                    try
+                    {
+                        int input = Int32.Parse(Console.ReadLine());
+                        switch ((Enums.MenuSuperAdmin)input)
+                        {
+                            case Enums.MenuSuperAdmin.CreateBank:
+                                Console.WriteLine("Enter Bank Admin Id");
+                                bank.UserId = Console.ReadLine();
+                                Console.WriteLine("Enter Bank Admin Name");
+                                bank.UserName = Console.ReadLine();
+                                Console.WriteLine("Enter Bank Admin PassWord");
+                                bank.Password = Console.ReadLine();
+                                Console.WriteLine("Enter Bank Name");
+                                bank.BankName = Console.ReadLine();
+                                Console.WriteLine("Enter RTGS Charges For Same Bank");
+                                bank.SameRtgsCharges = Convert.ToDouble(Console.ReadLine());
+                                Console.WriteLine("Enter IMPS Charges For Same Bank");
+                                bank.SameImpsCharges = Convert.ToDouble(Console.ReadLine());
+                                Console.WriteLine("Enter RTGS Charges For Different Bank");
+                                bank.OtherRtgsCharges = Convert.ToDouble(Console.ReadLine());
+                                Console.WriteLine("Enter IMPS Charges For Different Bank");
+                                bank.OtherImpsCharges = Convert.ToDouble(Console.ReadLine());
+                                Console.WriteLine("Enter Default Currency");
+                                bank.DefaultCurrency = Console.ReadLine();
+                                Console.WriteLine("Enter ExchangeRate");
+                                bank.CurrencyExchangeRates= Convert.ToDouble(Console.ReadLine());
+                                IsSuccess(superAdminService.CreateBank(bank));
+                                break;
+
+                            case Enums.MenuSuperAdmin.EditBankAdmin:
+                                Console.WriteLine("Enter Bank Id");
+                                string bankId = Console.ReadLine();
+                                Console.WriteLine("Enter Admin Id");
+                                admin.UserId = Console.ReadLine();
+                                Console.WriteLine("Enter Admin Name");
+                                admin.UserName = Console.ReadLine();
+                                Console.WriteLine("Enter New Password");
+                                admin.Password = Console.ReadLine();
+                                IsSuccess(superAdminService.EditBankAdminCredentials(bankId , admin));
+                                break;
+
+                            case Enums.MenuSuperAdmin.DisplayBankDetails:
+                                Console.WriteLine("Enter Bank ID");
+                                bankId= Console.ReadLine();
+                                if (superAdminService.DisplayBank(bankId) != null)
+                                {
+                                    bank = superAdminService.DisplayBank(bankId);
+
+                                    Console.WriteLine("\n Bank Admin Id:-" + bank.UserId);
+                                    Console.WriteLine("Bank Admin Name:-" + bank.UserName);
+                                    Console.WriteLine("Bank Name:-" + bank.BankName);
+                                    Console.WriteLine("Bank Id :- " + bank.BankId);
+                                    Console.WriteLine("RTGS Charges For Same Bank:- " + bank.SameRtgsCharges);
+                                    Console.WriteLine("IMPS Charges For Same Bank:-" + bank.SameImpsCharges);
+                                    Console.WriteLine("RTGS Charges For Different Banks:- " + bank.OtherRtgsCharges);
+                                    Console.WriteLine("IMPS Charges For Different Banks :-" + bank.OtherImpsCharges);
+                                    Console.WriteLine("Default Currency:-" + bank.DefaultCurrency);
+                                    Console.WriteLine("Currency Exchange Rate:-" + bank.CurrencyExchangeRates + "\n");
+                                    break;
+                                }
+                                else
+                                {
+                                    Console.WriteLine("No Banks Added Yet");
+                                    break;
+                                }
+
+
+                        }    
+                    }
+                    catch (FormatException)
+                    {
+                        Console.WriteLine("Invalid Input");
+                    }
+                }
+                while (!exit);
+            }
+
+            void UiBankAdmin()
+            {
+
             }
         }
     }

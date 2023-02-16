@@ -1,30 +1,27 @@
 ﻿using BankStimulation.Model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Transactions;
+
 
 namespace BankStimulation.Services
 {
     public class BankingService
     {   
 
-        public bool SetRtgs(double sameRtgs, double otherRtgs)
+        public bool SetRtgs(double sameRtgs, double otherRtgs , string bankId)
         {
-                GlobalDataStorage.yesBank.OtherRtgsCharges = otherRtgs;
-                GlobalDataStorage.yesBank.SameRtgsCharges = sameRtgs;
-                return true;
+            var refBank = GlobalDataStorage.Banks.FirstOrDefault(bank => bank.BankId == bankId);
+            refBank.OtherRtgsCharges = otherRtgs;
+            refBank.SameRtgsCharges = sameRtgs;
+            return true;
             
         }
 
-        public bool SetImps(double sameImps, double otherImps)
+        public bool SetImps(double sameImps, double otherImps , string bankId)
         {
-                GlobalDataStorage.yesBank.OtherImpsCharges = otherImps;
-                GlobalDataStorage.yesBank.SameImpsCharges = sameImps;
-                return true;
+            var refBank = GlobalDataStorage.Banks.FirstOrDefault(bank => bank.BankId == bankId);
+            refBank.OtherImpsCharges = otherImps;
+            refBank.SameImpsCharges = sameImps;
+            return true;
         
         }
 
