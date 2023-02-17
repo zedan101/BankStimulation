@@ -50,5 +50,17 @@ namespace BankStimulation.Services
                 return false;
             }
         }
+
+        public bool ValidateTransactionNumber(string transactionNumber)
+        {
+            return (GetTransactionsToApprove().Any(txn => txn.TransectionNum == transactionNumber));
+        }
+
+        public bool ValidateBankAdmin(string userId)
+        {
+            return GlobalDataStorage.Banks.Any(bank => bank.UserId == userId);
+            
+            
+        }
     }
 }

@@ -28,14 +28,8 @@ namespace BankStimulation.Services
 
         public bool ValidateSuperAdmin(string superAdminId , string superAdminPassword)
         {
-            if(superAdminId  == _superAdminId && superAdminPassword== _superAdminPassword)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return (superAdminId == _superAdminId) && (superAdminPassword == _superAdminPassword);
         }
+
     }
 }

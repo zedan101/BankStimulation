@@ -27,26 +27,19 @@ namespace BankStimulation.Services
 
         public bool ValidateIdAndAccNum(string rcvAccNum, string rcvBankId)
         {
-            if(Regex.IsMatch(rcvAccNum, "^[a-zA-Z]{3}[0-9]{8}$") && Regex.IsMatch(rcvBankId, "^[a-zA-Z]{3}[0-9]{8}$"))
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return Regex.IsMatch(rcvAccNum, "^[a-zA-Z]{3}[0-9]{8}$") && Regex.IsMatch(rcvBankId, "^[a-zA-Z]{3}[0-9]{8}$");
+            
         }
 
         public bool ValidateTransactionNumber(string txnNum)
         {
-            if (GlobalDataStorage.Transactions.Any(txn => txn.TransectionNum == txnNum))
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return GlobalDataStorage.Transactions.Any(txn => txn.TransectionNum == txnNum);
+        }
+
+        public bool ValidateBankId(string bankId)
+        {
+            return GlobalDataStorage.Banks.Any(bnk => bnk.BankId == bankId);
+            
         }
     }
 }

@@ -158,5 +158,11 @@ namespace BankStimulation.Services
                 return false;
             }
          }
+
+        public bool ValidateEmpCredentials(string empId)
+        {
+            return GlobalDataStorage.BankEmp.Any(bnkEmp => bnkEmp.UserId == empId);
+             
+        }
     }
 }

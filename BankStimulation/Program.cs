@@ -1,5 +1,7 @@
 ﻿using BankStimulation.Services;
 using BankStimulation.Model;
+using System.Net.Http.Headers;
+
 namespace BankStimulation
 {
     public class Program
@@ -525,39 +527,66 @@ namespace BankStimulation
                             case Enums.MenuSuperAdmin.EditBankAdmin:
                                 Console.WriteLine("Enter Bank Id");
                                 string bankId = Console.ReadLine();
-                                Console.WriteLine("Enter Admin Id");
-                                admin.UserId = Console.ReadLine();
-                                Console.WriteLine("Enter Admin Name");
-                                admin.UserName = Console.ReadLine();
-                                Console.WriteLine("Enter New Password");
-                                admin.Password = Console.ReadLine();
-                                IsSuccess(superAdminService.EditBankAdminCredentials(bankId , admin));
-                                break;
+                                if (bankingService.ValidateBankId(bankId))
+                                {
+                                    Console.WriteLine("Enter Admin Id");
+                                    admin.UserId = Console.ReadLine();
+                                    if (bankAdminService.ValidateBankAdmin(admin.UserId))
+                                    {
+                                        Console.WriteLine("Enter Admin Name");
+                                        admin.UserName = Console.ReadLine();
+                                        Console.WriteLine("Enter New Password");
+                                        admin.Password = Console.ReadLine();
+                                        IsSuccess(superAdminService.EditBankAdminCredentials(bankId, admin));
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("Invalid Admin Id");
+                                        break;
+                                    }
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Invalid BankId");
+                                    break;
+                                }
+                                
+                                
 
                             case Enums.MenuSuperAdmin.DisplayBankDetails:
                                 Console.WriteLine("Enter Bank ID");
                                 bankId= Console.ReadLine();
-                                if (superAdminService.DisplayBank(bankId) != null)
+                                if(bankingService.ValidateBankId(bankId))
                                 {
-                                    bank = superAdminService.DisplayBank(bankId);
+                                    if (superAdminService.DisplayBank(bankId) != null)
+                                    {
+                                        bank = superAdminService.DisplayBank(bankId);
 
-                                    Console.WriteLine("\n Bank Admin Id:-" + bank.UserId);
-                                    Console.WriteLine("Bank Admin Name:-" + bank.UserName);
-                                    Console.WriteLine("Bank Name:-" + bank.BankName);
-                                    Console.WriteLine("Bank Id :- " + bank.BankId);
-                                    Console.WriteLine("RTGS Charges For Same Bank:- " + bank.SameRtgsCharges);
-                                    Console.WriteLine("IMPS Charges For Same Bank:-" + bank.SameImpsCharges);
-                                    Console.WriteLine("RTGS Charges For Different Banks:- " + bank.OtherRtgsCharges);
-                                    Console.WriteLine("IMPS Charges For Different Banks :-" + bank.OtherImpsCharges);
-                                    Console.WriteLine("Default Currency:-" + bank.DefaultCurrency);
-                                    Console.WriteLine("Currency Exchange Rate:-" + bank.CurrencyExchangeRates + "\n");
-                                    break;
+                                        Console.WriteLine("\n Bank Admin Id:-" + bank.UserId);
+                                        Console.WriteLine("Bank Admin Name:-" + bank.UserName);
+                                        Console.WriteLine("Bank Name:-" + bank.BankName);
+                                        Console.WriteLine("Bank Id :- " + bank.BankId);
+                                        Console.WriteLine("RTGS Charges For Same Bank:- " + bank.SameRtgsCharges);
+                                        Console.WriteLine("IMPS Charges For Same Bank:-" + bank.SameImpsCharges);
+                                        Console.WriteLine("RTGS Charges For Different Banks:- " + bank.OtherRtgsCharges);
+                                        Console.WriteLine("IMPS Charges For Different Banks :-" + bank.OtherImpsCharges);
+                                        Console.WriteLine("Default Currency:-" + bank.DefaultCurrency);
+                                        Console.WriteLine("Currency Exchange Rate:-" + bank.CurrencyExchangeRates + "\n");
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("No Banks Added Yet");
+                                        break;
+                                    }
                                 }
                                 else
                                 {
-                                    Console.WriteLine("No Banks Added Yet");
+                                    Console.WriteLine("Invalid BankId");
                                     break;
                                 }
+                                
 
                             case Enums.MenuSuperAdmin.Exit:
                                 exit = true;
@@ -607,12 +636,21 @@ namespace BankStimulation
                             case Enums.MenuBankAdmin.EditEmployees:
                                 Console.WriteLine("Enter Bank Employee Id");
                                 emp.UserId = Console.ReadLine();
-                                Console.WriteLine("Enter New Employee Name");
-                                emp.UserName = Console.ReadLine();
-                                Console.WriteLine("Enter New Password");
-                                emp.Password = Console.ReadLine();
-                                IsSuccess(bankAdminService.EditEmployees(emp));
-                                break;
+                                if (bankEmployeeService.ValidateEmpCredentials(emp.UserId))
+                                {
+                                    Console.WriteLine("Enter New Employee Name");
+                                    emp.UserName = Console.ReadLine();
+                                    Console.WriteLine("Enter New Password");
+                                    emp.Password = Console.ReadLine();
+                                    IsSuccess(bankAdminService.EditEmployees(emp));
+                                    break;
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Invalid Employee Id");
+                                    break;
+                                }
+                                
 
                             case Enums.MenuBankAdmin.ApproveTransactions:
                                 if (bankAdminService.GetTransactionsToApprove().Any())
@@ -632,8 +670,16 @@ namespace BankStimulation
                                     
                                     Console.WriteLine("Enter Transaction Number To Approve");
                                     string txnNum = Console.ReadLine();
-                                    IsSuccess(bankAdminService.ApproveTransaction(txnNum));
-                                    break;
+                                    if (bankAdminService.ValidateTransactionNumber(txnNum))
+                                    {
+                                        IsSuccess(bankAdminService.ApproveTransaction(txnNum));
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("Invalid Transaction Number");
+                                        break;
+                                    }
 
                                     
                                 }
