@@ -36,7 +36,7 @@ namespace BankStimulation
 
         public enum MenuBankAdmin
         {
-            Exit, AddEmployees , EditEmployees , ApproveTransactions , DisplayEmployeeDetails , DisplayTransactionHistory , DisplayAccountDetails
+            Exit, AddEmployees , EditEmployees , ApproveTransactions , DisplayTransactionHistory , DisplayAccountDetails
         }
     }
 }

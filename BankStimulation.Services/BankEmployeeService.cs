@@ -9,11 +9,6 @@ namespace BankStimulation.Services
         AccountHolderService _accHldrService = new AccountHolderService();
         BankingService _bankingService= new BankingService();
 
-        public Accounts DisplayAccountDetails(string accNum)
-        {
-            return GlobalDataStorage.AccHolder.FirstOrDefault(e => e.AccNumber == accNum);
-        }
-
         public bool CreatNewAccount(Accounts accHolder)
         {
            
@@ -31,7 +26,7 @@ namespace BankStimulation.Services
         public bool UpdateBankAccount(string accNumber,string accPin,string accHldrName)
         {
             
-            var currentDetails = GlobalDataStorage.AccHolder.FirstOrDefault(accHldr => accHldr.AccNumber == accNumber);
+            var currentDetails = GlobalDataStorage.AccHolder.FirstOrDefault(accHldr => accHldr.AccNumber == accNumber && accHldr.BankId == currentBankId);
             if (currentDetails != null)
             {
                 if(accHldrName != null)
@@ -76,17 +71,11 @@ namespace BankStimulation.Services
             
         }
 
-        public List<Transaction> ViewTransectionHistory(string accNumber)
-        {
-            List<Transaction> txn = new List<Transaction>();
-            txn = GlobalDataStorage.Transactions.Where(txn => txn.SenderAccNum == accNumber || txn.RecieversAccNum == accNumber).ToList();
-            return txn;
-        }
-
         public bool RevertTransection(string txnNum)
         {
-            
-            var transactionToRevert = GlobalDataStorage.Transactions.FirstOrDefault(txnToRevert => txnToRevert.TransectionNum == txnNum);
+            Transaction transactionToRevert = new();   
+            var txn = GlobalDataStorage.Transactions.FirstOrDefault(txnToRevert => txnToRevert.TransectionNum == txnNum);
+            transactionToRevert = txn;
             if (transactionToRevert.TransactionType == Enums.TransferType.RTGS) 
             {
                 if (transactionToRevert.SendersBankId == transactionToRevert.RecieversBankId)
@@ -95,7 +84,7 @@ namespace BankStimulation.Services
                     var recieverAccToRevertTxn = GlobalDataStorage.AccHolder.FirstOrDefault(accToRvrtTxn => accToRvrtTxn.AccNumber == transactionToRevert.RecieversAccNum);
                     recieverAccToRevertTxn.AccountBalance -= transactionToRevert.TransactionAmount;
                     senderAccToRevertTxn.AccountBalance += transactionToRevert.TransactionAmount;
-                    transactionToRevert.TransactionStatus = Enums.TransactionStatus.Success;
+                    GlobalDataStorage.Transactions.Add(transactionToRevert);
                     return true;
                 }
                 else

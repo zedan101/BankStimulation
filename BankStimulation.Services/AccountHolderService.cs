@@ -9,7 +9,7 @@ namespace BankStimulation.Services
 
         public bool DepositeFund(double amount)
         {
-            var accHldr = GlobalDataStorage. AccHolder.FirstOrDefault(accHldr => accHldr.AccNumber== loggedInUserAccNum);
+            var accHldr = GlobalDataStorage. AccHolder.FirstOrDefault(accHldr => accHldr.AccNumber== loggedInUserAccNum && accHldr.BankId == loggedInUserbankId);
             if(amount != 0 )
             {
                 accHldr.AccountBalance += amount;
@@ -24,7 +24,7 @@ namespace BankStimulation.Services
 
         public bool WithdrawFund(double amount)
         {
-            var accHldr = GlobalDataStorage.AccHolder.FirstOrDefault(accHldr => accHldr.AccNumber == loggedInUserAccNum);
+            var accHldr = GlobalDataStorage.AccHolder.FirstOrDefault(accHldr => accHldr.AccNumber == loggedInUserAccNum && accHldr.BankId == loggedInUserbankId);
             if(accHldr.AccountBalance >= amount && amount != 0 )
             {
                 accHldr.AccountBalance -= amount;
@@ -39,7 +39,7 @@ namespace BankStimulation.Services
 
         public bool TransferFunds(double amount, string recieverAccNum, string recieverBankId,Enums.TransferType transferType)
         {
-            var accHldr = GlobalDataStorage.AccHolder.FirstOrDefault(accHldr => accHldr.AccNumber == loggedInUserAccNum);
+            var accHldr = GlobalDataStorage.AccHolder.FirstOrDefault(accHldr => accHldr.AccNumber == loggedInUserAccNum && accHldr.BankId == loggedInUserbankId);
             if (accHldr.AccountBalance >= amount && amount != 0)
             {
                 Transaction newTransaction = new Transaction();
@@ -98,13 +98,6 @@ namespace BankStimulation.Services
                     return GlobalDataStorage.Banks.FirstOrDefault(bank => bank.BankId == loggedInUserbankId).OtherImpsCharges;
                 }
             }
-        }
-
-        public List<Transaction> ViewTransectionHistory()
-        {
-            
-            var txn = GlobalDataStorage.Transactions.Where(txn=> txn.RecieversAccNum == loggedInUserAccNum || txn.SenderAccNum == loggedInUserAccNum).ToList();
-            return txn;
         }
 
         public bool SetAccHolderData(Accounts accountHolder)

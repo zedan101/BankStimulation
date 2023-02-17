@@ -11,6 +11,7 @@ namespace BankStimulation
             AccountHolderService accHolderService = new AccountHolderService();
             BankEmployeeService bankEmployeeService = new BankEmployeeService();
             BankingService bankingService = new BankingService();
+            CommonService commonService = new CommonService();
             Console.WriteLine("Bank Stimulation");
             bool exit = false;
             do
@@ -85,7 +86,7 @@ namespace BankStimulation
                                 user.Password = Console.ReadLine();
                                 if (bankAdminService.ValidateBankAdmin(user.UserId, user.Password))
                                 {
-                                    UiBankAdmin();
+                                    UiBankAdmin(GlobalDataStorage.Banks.FirstOrDefault(bank => bank.UserId == user.UserId).BankId);
                                     break;
                                 }
                                 else
@@ -211,9 +212,9 @@ namespace BankStimulation
 
 
                             case Enums.MenuAccHolder.transactionHistory:
-                                if (accHolderService.ViewTransectionHistory().Any())
+                                if (commonService.ViewTransectionHistory(accNm, bankId).Any())
                                 {
-                                    foreach (Transaction item in accHolderService.ViewTransectionHistory())
+                                    foreach (Transaction item in commonService.ViewTransectionHistory(accNm, bankId))
                                     {
                                         Console.WriteLine("Transaction Number:-" + item.TransectionNum);
                                         Console.WriteLine("Transaction Amount:-" + item.TransactionAmount);
@@ -392,9 +393,9 @@ namespace BankStimulation
                                 accNum = Console.ReadLine();
                                 if(accHolderService.ValidateAccNum(accNum))
                                 {
-                                    if (bankEmployeeService.ViewTransectionHistory(accNum).Any())
+                                    if (commonService.ViewTransectionHistory(accNum, bankId).Any())
                                     {
-                                        foreach(Transaction item in bankEmployeeService.ViewTransectionHistory(accNum))
+                                        foreach(Transaction item in commonService.ViewTransectionHistory(accNum, bankId))
                                         {
                                             Console.WriteLine("Transaction Number:-" + item.TransectionNum);
                                             Console.WriteLine("Transaction Amount:-" + item.TransactionAmount);
@@ -441,7 +442,7 @@ namespace BankStimulation
                                 if (accHolderService.ValidateAccNum(accNum))
                                 {
                                     Accounts accountDetail = new Accounts();
-                                    accountDetail = bankEmployeeService.DisplayAccountDetails(accNum);
+                                    accountDetail = commonService.DisplayAccountDetails(accNum, bankId);
                                     Console.WriteLine("Account Number :-" + accountDetail.AccNumber);
                                     Console.WriteLine("Account Holder Name :-" + accountDetail.UserName);
                                     Console.WriteLine("Account Balance :-" + accountDetail.AccountBalance);
@@ -558,6 +559,10 @@ namespace BankStimulation
                                     break;
                                 }
 
+                            case Enums.MenuSuperAdmin.Exit:
+                                exit = true;
+                                break;
+
 
                         }    
                     }
@@ -569,8 +574,139 @@ namespace BankStimulation
                 while (!exit);
             }
 
-            void UiBankAdmin()
+            void UiBankAdmin(string bnkId)
             {
+
+                bool exit = false;
+                do
+                {
+                    BankEmployee emp = new();
+                    Console.WriteLine("\n To Add A New Employee Enter 1");
+                    Console.WriteLine("To Edit Employee Credentials Enter 2");
+                    Console.WriteLine("To Approve Transactions Enter 3");
+                    Console.WriteLine("To View Transaction Enter 4");
+                    Console.WriteLine("To View Employee Details Enter 5");
+                    Console.WriteLine("To View Account Details Enter 6");
+                    Console.WriteLine("To Exit Enter 0");
+                    try
+                    {
+                        int input = Int32.Parse(Console.ReadLine());
+                        switch ((Enums.MenuBankAdmin)input)
+                        {
+                            case Enums.MenuBankAdmin.AddEmployees:
+                                Console.WriteLine("Enter Bank Employee Id");
+                                emp.UserId = Console.ReadLine();
+                                Console.WriteLine("Enter Bank Employee Name");
+                                emp.UserName = Console.ReadLine();
+                                Console.WriteLine("Enter Bank Employee PassWord");
+                                emp.Password = Console.ReadLine();
+                                emp.BankId = bnkId;
+                                IsSuccess(bankAdminService.AddEmployees(emp));
+                                break;
+
+                            case Enums.MenuBankAdmin.EditEmployees:
+                                Console.WriteLine("Enter Bank Employee Id");
+                                emp.UserId = Console.ReadLine();
+                                Console.WriteLine("Enter New Employee Name");
+                                emp.UserName = Console.ReadLine();
+                                Console.WriteLine("Enter New Password");
+                                emp.Password = Console.ReadLine();
+                                IsSuccess(bankAdminService.EditEmployees(emp));
+                                break;
+
+                            case Enums.MenuBankAdmin.ApproveTransactions:
+                                if (bankAdminService.GetTransactionsToApprove().Any())
+                                {
+                                    foreach(Transaction txn in bankAdminService.GetTransactionsToApprove())
+                                    {
+                                        Console.WriteLine("Transaction Number:-" + txn.TransectionNum);
+                                        Console.WriteLine("Transaction Amount:-" + txn.TransactionAmount);
+                                        Console.WriteLine("Recievers Account Number:-" + txn.RecieversAccNum);
+                                        Console.WriteLine("Recievers Bank Id :- " + txn.RecieversBankId);
+                                        Console.WriteLine("Senders Account Number:- " + txn.SenderAccNum);
+                                        Console.WriteLine("Recievers Bank Id:-" + txn.SendersBankId);
+                                        Console.WriteLine("Transaction Type:- " + txn.TransactionType);
+                                        Console.WriteLine("Transaction Status :-" + txn.TransactionStatus);
+                                    }
+                                    
+                                    
+                                    Console.WriteLine("Enter Transaction Number To Approve");
+                                    string txnNum = Console.ReadLine();
+                                    IsSuccess(bankAdminService.ApproveTransaction(txnNum));
+                                    break;
+
+                                    
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Nothing to Approve");
+                                    break;
+                                }
+
+                            case Enums.MenuBankAdmin.DisplayTransactionHistory:
+                                Console.WriteLine("Enter account Number");
+                                string accNum = Console.ReadLine();
+                                if (accHolderService.ValidateAccNum(accNum))
+                                {
+                                    if (commonService.ViewTransectionHistory(accNum, bnkId).Any())
+                                    {
+                                        foreach (Transaction item in commonService.ViewTransectionHistory(accNum, bnkId))
+                                        {
+                                            Console.WriteLine("Transaction Number:-" + item.TransectionNum);
+                                            Console.WriteLine("Transaction Amount:-" + item.TransactionAmount);
+                                            Console.WriteLine("Recievers Account Number:-" + item.RecieversAccNum);
+                                            Console.WriteLine("Recievers Bank Id :- " + item.RecieversBankId);
+                                            Console.WriteLine("Senders Account Number:- " + item.SenderAccNum);
+                                            Console.WriteLine("Recievers Bank Id:-" + item.SendersBankId);
+                                            Console.WriteLine("Transaction Type:- " + item.TransactionType);
+                                            Console.WriteLine("Transaction Status :-" + item.TransactionStatus);
+                                        }
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("No Transactions Yet");
+                                        break;
+                                    }
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Invalid Account Number");
+                                    break;
+                                }
+
+                            case Enums.MenuBankAdmin.DisplayAccountDetails:
+                                Console.WriteLine("Enter Account number ");
+                                accNum = Console.ReadLine();
+                                if (accHolderService.ValidateAccNum(accNum))
+                                {
+                                    Accounts accountDetail = new Accounts();
+                                    accountDetail = commonService.DisplayAccountDetails(accNum, bnkId);
+                                    Console.WriteLine("Account Number :-" + accountDetail.AccNumber);
+                                    Console.WriteLine("Account Holder Name :-" + accountDetail.UserName);
+                                    Console.WriteLine("Account Balance :-" + accountDetail.AccountBalance);
+                                    Console.WriteLine("BankId :-" + accountDetail.BankId);
+                                    break;
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Invalid Account Number");
+                                    break;
+                                }
+
+                            case Enums.MenuBankAdmin.Exit:
+                                exit = true;
+                                break;
+
+
+                        }
+                    }
+                    catch (FormatException)
+                    {
+                        Console.WriteLine("Invalid Input");
+                    }
+                }
+                while (!exit);
 
             }
         }
