@@ -26,7 +26,7 @@ namespace BankStimulation.Services
         public bool UpdateBankAccount(string accNumber,string accPin,string accHldrName)
         {
             
-            var currentDetails = GlobalDataStorage.AccHolder.FirstOrDefault(accHldr => accHldr.AccNumber == accNumber && accHldr.BankId == currentBankId);
+            var currentDetails = GlobalDataStorage.Banks.First(bank => bank.BankId == currentBankId).AccHolder.FirstOrDefault(accHldr => accHldr.AccNumber == accNumber && accHldr.BankId == currentBankId);
             if (currentDetails != null)
             {
                 if(accHldrName != null)
@@ -74,31 +74,31 @@ namespace BankStimulation.Services
         public bool RevertTransection(string txnNum)
         {
             Transaction transactionToRevert = new();   
-            var txn = GlobalDataStorage.Transactions.FirstOrDefault(txnToRevert => txnToRevert.TransectionNum == txnNum);
+            var txn = GlobalDataStorage.Banks.First(bank => bank.BankId == currentBankId).Transactions.FirstOrDefault(txnToRevert => txnToRevert.TransectionNum == txnNum);
             transactionToRevert = txn;
             if (transactionToRevert.TransactionType == Enums.TransferType.RTGS) 
             {
                 if (transactionToRevert.SendersBankId == transactionToRevert.RecieversBankId)
                 {
-                    var senderAccToRevertTxn = GlobalDataStorage.AccHolder.FirstOrDefault(accToRvrtTxn => accToRvrtTxn.AccNumber == transactionToRevert.SenderAccNum);
-                    var recieverAccToRevertTxn = GlobalDataStorage.AccHolder.FirstOrDefault(accToRvrtTxn => accToRvrtTxn.AccNumber == transactionToRevert.RecieversAccNum);
+                    var senderAccToRevertTxn = GlobalDataStorage.Banks.First(bank => bank.BankId == currentBankId).AccHolder.FirstOrDefault(accToRvrtTxn => accToRvrtTxn.AccNumber == transactionToRevert.SenderAccNum);
+                    var recieverAccToRevertTxn = GlobalDataStorage.Banks.First(bank => bank.BankId == currentBankId).AccHolder.FirstOrDefault(accToRvrtTxn => accToRvrtTxn.AccNumber == transactionToRevert.RecieversAccNum);
                     recieverAccToRevertTxn.AccountBalance -= transactionToRevert.TransactionAmount;
                     senderAccToRevertTxn.AccountBalance += transactionToRevert.TransactionAmount;
-                    GlobalDataStorage.Transactions.Add(transactionToRevert);
+                    GlobalDataStorage.Banks.First(bank => bank.BankId == currentBankId).Transactions.Add(transactionToRevert);
                     return true;
                 }
                 else
                 {
                     if (transactionToRevert.SendersBankId == currentBankId)
                     {
-                        var accToRevertTxn = GlobalDataStorage.AccHolder.FirstOrDefault(accToRvrtTxn => accToRvrtTxn.AccNumber == transactionToRevert.SenderAccNum);
+                        var accToRevertTxn = GlobalDataStorage.Banks.First(bank => bank.BankId == currentBankId).AccHolder.FirstOrDefault(accToRvrtTxn => accToRvrtTxn.AccNumber == transactionToRevert.SenderAccNum);
                         transactionToRevert.TransactionStatus = Enums.TransactionStatus.Pending;
                         return true;
 
                     }
                     else if (transactionToRevert.RecieversBankId == currentBankId)
                     {
-                        var accToRevertTxn = GlobalDataStorage.AccHolder.FirstOrDefault(accToRvrtTxn => accToRvrtTxn.AccNumber == transactionToRevert.RecieversAccNum);
+                        var accToRevertTxn = GlobalDataStorage.Banks.First(bank => bank.BankId == currentBankId).AccHolder.FirstOrDefault(accToRvrtTxn => accToRvrtTxn.AccNumber == transactionToRevert.RecieversAccNum);
                         accToRevertTxn.AccountBalance -= transactionToRevert.TransactionAmount;
                         transactionToRevert.TransactionStatus = Enums.TransactionStatus.Pending;
                         return true;
@@ -114,8 +114,8 @@ namespace BankStimulation.Services
             {
                 if (transactionToRevert.SendersBankId==transactionToRevert.RecieversBankId)
                 {
-                    var senderAccToRevertTxn = GlobalDataStorage.AccHolder.FirstOrDefault(accToRvrtTxn => accToRvrtTxn.AccNumber == transactionToRevert.SenderAccNum);
-                    var recieverAccToRevertTxn = GlobalDataStorage.AccHolder.FirstOrDefault(accToRvrtTxn => accToRvrtTxn.AccNumber == transactionToRevert.RecieversAccNum);
+                    var senderAccToRevertTxn = GlobalDataStorage.Banks.First(bank => bank.BankId == currentBankId).AccHolder.FirstOrDefault(accToRvrtTxn => accToRvrtTxn.AccNumber == transactionToRevert.SenderAccNum);
+                    var recieverAccToRevertTxn = GlobalDataStorage.Banks.First(bank => bank.BankId == currentBankId).AccHolder.FirstOrDefault(accToRvrtTxn => accToRvrtTxn.AccNumber == transactionToRevert.RecieversAccNum);
                     senderAccToRevertTxn.AccountBalance += transactionToRevert.TransactionAmount;
                     recieverAccToRevertTxn.AccountBalance -= transactionToRevert.TransactionAmount;
                     transactionToRevert.TransactionStatus = Enums.TransactionStatus.Success;
@@ -125,14 +125,14 @@ namespace BankStimulation.Services
                 {
                     if(transactionToRevert.SendersBankId == currentBankId)
                     {
-                        var accToRevertTxn = GlobalDataStorage.AccHolder.FirstOrDefault(accToRvrtTxn => accToRvrtTxn.AccNumber == transactionToRevert.SenderAccNum);
+                        var accToRevertTxn = GlobalDataStorage.Banks.First(bank => bank.BankId == currentBankId).AccHolder.FirstOrDefault(accToRvrtTxn => accToRvrtTxn.AccNumber == transactionToRevert.SenderAccNum);
                         accToRevertTxn.AccountBalance += transactionToRevert.TransactionAmount;
                         transactionToRevert.TransactionStatus = Enums.TransactionStatus.Success;
                         return true;
 
                     }
                     else if(transactionToRevert.RecieversBankId == currentBankId){
-                        var accToRevertTxn = GlobalDataStorage.AccHolder.FirstOrDefault(accToRvrtTxn => accToRvrtTxn.AccNumber == transactionToRevert.RecieversAccNum);
+                        var accToRevertTxn = GlobalDataStorage.Banks.First(bank => bank.BankId == currentBankId).AccHolder.FirstOrDefault(accToRvrtTxn => accToRvrtTxn.AccNumber == transactionToRevert.RecieversAccNum);
                         accToRevertTxn.AccountBalance -= transactionToRevert.TransactionAmount;
                         transactionToRevert.TransactionStatus = Enums.TransactionStatus.Success;
                         return true;
@@ -145,12 +145,12 @@ namespace BankStimulation.Services
             }
         }
 
-        public bool ValidateEmpCredentials(string empId, string empPass)
+        public bool ValidateEmployee(string empId, string empPass , string idBank)
          {
-            var validateCred = GlobalDataStorage.BankEmp.FirstOrDefault(bnkEmp => bnkEmp.UserId == empId && bnkEmp.Password == empPass);
-            if (validateCred != null)
+      
+            if (GlobalDataStorage.Banks.Any(bank => bank.BankId == idBank) && GlobalDataStorage.Banks.First(bank => bank.BankId == idBank).BankEmp.Any(bnkEmp => bnkEmp.UserId == empId && bnkEmp.Password == empPass))
             {
-                currentBankId = validateCred.BankId;
+                currentBankId = idBank;
                 return true;
             }
             else
@@ -159,9 +159,9 @@ namespace BankStimulation.Services
             }
          }
 
-        public bool ValidateEmpCredentials(string empId)
+        public bool ValidateEmpCredentials(string empId , string idBank)
         {
-            return GlobalDataStorage.BankEmp.Any(bnkEmp => bnkEmp.UserId == empId);
+            return GlobalDataStorage.Banks.First(bank => bank.BankId == idBank).BankEmp.Any(bnkEmp => bnkEmp.UserId == empId);
              
         }
     }

@@ -31,9 +31,9 @@ namespace BankStimulation.Services
             
         }
 
-        public bool ValidateTransactionNumber(string txnNum)
+        public bool ValidateTransactionNumber(string txnNum , string bankId)
         {
-            return GlobalDataStorage.Transactions.Any(txn => txn.TransectionNum == txnNum);
+            return GlobalDataStorage.Banks.First(bank => bank.BankId == bankId).Transactions.Any(txn => txn.TransectionNum == txnNum);
         }
 
         public bool ValidateBankId(string bankId)

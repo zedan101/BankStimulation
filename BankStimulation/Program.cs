@@ -37,9 +37,11 @@ namespace BankStimulation
                                 user.UserId = Console.ReadLine();
                                 Console.WriteLine("Enter Password");
                                 user.Password = Console.ReadLine();
-                                if (bankEmployeeService.ValidateEmpCredentials(user.UserId, user.Password))
+                                Console.WriteLine("Enter BankID");
+                                string bankId = Console.ReadLine();
+                                if (bankEmployeeService.ValidateEmployee(user.UserId, user.Password , bankId))
                                 {
-                                    UiBankEmployee(user.UserId);
+                                    UiBankEmployee(user.UserId , bankId);
                                     break;
                                 }
                                 else
@@ -54,9 +56,11 @@ namespace BankStimulation
                                 user.UserId = Console.ReadLine();
                                 Console.WriteLine("Enter Password");
                                 user.Password = Console.ReadLine();
-                                if (accHolderService.ValidateAccHolder(user.Password, user.UserId))
+                                Console.WriteLine("Enter BankID");
+                                bankId = Console.ReadLine();
+                                if (accHolderService.ValidateAccHolder(user.Password, user.UserId , bankId))
                                 {
-                                    UiAccountHolder(user.UserId);
+                                    UiAccountHolder(user.UserId , bankId);
                                     break;
                                 }
                                 else
@@ -86,9 +90,11 @@ namespace BankStimulation
                                 user.UserId = Console.ReadLine();
                                 Console.WriteLine("Enter Password");
                                 user.Password = Console.ReadLine();
-                                if (bankAdminService.ValidateBankAdmin(user.UserId, user.Password))
+                                Console.WriteLine("Enter BankID");
+                                bankId = Console.ReadLine();
+                                if (bankAdminService.ValidateBankAdmin(user.UserId, user.Password , bankId))
                                 {
-                                    UiBankAdmin(GlobalDataStorage.Banks.FirstOrDefault(bank => bank.UserId == user.UserId).BankId);
+                                    UiBankAdmin(bankId);
                                     break;
                                 }
                                 else
@@ -116,9 +122,8 @@ namespace BankStimulation
             }
             while (!exit);
 
-            void UiAccountHolder(string accNm)
+            void UiAccountHolder(string accNm , string bankId)
             {
-                string bankId = GlobalDataStorage.AccHolder.FirstOrDefault(acchldr => acchldr.AccNumber == accNm).BankId;
                 bool exit = false;
                 do
                 {
@@ -252,9 +257,8 @@ namespace BankStimulation
                 
 
             }
-            void UiBankEmployee(string empId)
+            void UiBankEmployee(string empId , string bankId)
             { 
-                string bankId = GlobalDataStorage.BankEmp.FirstOrDefault(emp => emp.UserId == empId).BankId;
                 bool exit = false;
                 do
                 {
@@ -310,7 +314,7 @@ namespace BankStimulation
                             case Enums.MenuBankEmp.UpdateBankAccount:
                                 Console.WriteLine("Enter Account Number of Account To Be Updated");
                                 string accNum = Console.ReadLine();
-                                if(accHolderService.ValidateAccNum(accNum))
+                                if(accHolderService.ValidateAccNum(accNum , bankId))
                                 {
                                     Console.WriteLine("Enter Updated Name");
                                     string accHldrName = Console.ReadLine();
@@ -393,7 +397,7 @@ namespace BankStimulation
                             case Enums.MenuBankEmp.ViewTransactionHistory:
                                 Console.WriteLine("Enter account Number");
                                 accNum = Console.ReadLine();
-                                if(accHolderService.ValidateAccNum(accNum))
+                                if(accHolderService.ValidateAccNum(accNum , bankId))
                                 {
                                     if (commonService.ViewTransectionHistory(accNum, bankId).Any())
                                     {
@@ -426,7 +430,7 @@ namespace BankStimulation
                             case Enums.MenuBankEmp.RevertTransaction:
                                 Console.WriteLine("Enter Transaction Number");
                                 string transactionNum = Console.ReadLine();
-                                if (bankingService.ValidateTransactionNumber(transactionNum))
+                                if (bankingService.ValidateTransactionNumber(transactionNum , bankId))
                                 {
                                     IsSuccess(bankEmployeeService.RevertTransection(transactionNum));
                                     break;
@@ -441,7 +445,7 @@ namespace BankStimulation
                             case Enums.MenuBankEmp.DisplayAccdetails:
                                 Console.WriteLine("Enter Account number ");
                                 accNum = Console.ReadLine();
-                                if (accHolderService.ValidateAccNum(accNum))
+                                if (accHolderService.ValidateAccNum(accNum , bankId))
                                 {
                                     Accounts accountDetail = new Accounts();
                                     accountDetail = commonService.DisplayAccountDetails(accNum, bankId);
@@ -502,11 +506,11 @@ namespace BankStimulation
                         {
                             case Enums.MenuSuperAdmin.CreateBank:
                                 Console.WriteLine("Enter Bank Admin Id");
-                                bank.UserId = Console.ReadLine();
+                                bank.Admin.UserId = Console.ReadLine();
                                 Console.WriteLine("Enter Bank Admin Name");
-                                bank.UserName = Console.ReadLine();
+                                bank.Admin.UserName = Console.ReadLine();
                                 Console.WriteLine("Enter Bank Admin PassWord");
-                                bank.Password = Console.ReadLine();
+                                bank.Admin.Password = Console.ReadLine();
                                 Console.WriteLine("Enter Bank Name");
                                 bank.BankName = Console.ReadLine();
                                 Console.WriteLine("Enter RTGS Charges For Same Bank");
@@ -531,7 +535,7 @@ namespace BankStimulation
                                 {
                                     Console.WriteLine("Enter Admin Id");
                                     admin.UserId = Console.ReadLine();
-                                    if (bankAdminService.ValidateBankAdmin(admin.UserId))
+                                    if (bankAdminService.ValidateBankAdmin(admin.UserId , bankId))
                                     {
                                         Console.WriteLine("Enter Admin Name");
                                         admin.UserName = Console.ReadLine();
@@ -563,8 +567,8 @@ namespace BankStimulation
                                     {
                                         bank = superAdminService.DisplayBank(bankId);
 
-                                        Console.WriteLine("\n Bank Admin Id:-" + bank.UserId);
-                                        Console.WriteLine("Bank Admin Name:-" + bank.UserName);
+                                        Console.WriteLine("\n Bank Admin Id:-" + bank.Admin.UserId);
+                                        Console.WriteLine("Bank Admin Name:-" + bank.Admin.UserName);
                                         Console.WriteLine("Bank Name:-" + bank.BankName);
                                         Console.WriteLine("Bank Id :- " + bank.BankId);
                                         Console.WriteLine("RTGS Charges For Same Bank:- " + bank.SameRtgsCharges);
@@ -636,7 +640,7 @@ namespace BankStimulation
                             case Enums.MenuBankAdmin.EditEmployees:
                                 Console.WriteLine("Enter Bank Employee Id");
                                 emp.UserId = Console.ReadLine();
-                                if (bankEmployeeService.ValidateEmpCredentials(emp.UserId))
+                                if (bankEmployeeService.ValidateEmpCredentials(emp.UserId , bnkId))
                                 {
                                     Console.WriteLine("Enter New Employee Name");
                                     emp.UserName = Console.ReadLine();
@@ -692,7 +696,7 @@ namespace BankStimulation
                             case Enums.MenuBankAdmin.DisplayTransactionHistory:
                                 Console.WriteLine("Enter account Number");
                                 string accNum = Console.ReadLine();
-                                if (accHolderService.ValidateAccNum(accNum))
+                                if (accHolderService.ValidateAccNum(accNum , bnkId))
                                 {
                                     if (commonService.ViewTransectionHistory(accNum, bnkId).Any())
                                     {
@@ -724,7 +728,7 @@ namespace BankStimulation
                             case Enums.MenuBankAdmin.DisplayAccountDetails:
                                 Console.WriteLine("Enter Account number ");
                                 accNum = Console.ReadLine();
-                                if (accHolderService.ValidateAccNum(accNum))
+                                if (accHolderService.ValidateAccNum(accNum , bnkId))
                                 {
                                     Accounts accountDetail = new Accounts();
                                     accountDetail = commonService.DisplayAccountDetails(accNum, bnkId);

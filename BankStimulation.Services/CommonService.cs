@@ -11,14 +11,14 @@ namespace BankStimulation.Services
     {
         public Accounts DisplayAccountDetails(string accNum , string bankId)
         {
-            return GlobalDataStorage.AccHolder.FirstOrDefault(e => e.AccNumber == accNum && e.BankId==bankId);
+            return GlobalDataStorage.Banks.First(bank => bank.BankId == bankId).AccHolder.FirstOrDefault(e => e.AccNumber == accNum);
         }
 
         public List<Transaction> ViewTransectionHistory(string accNumber, string bankId)
         {
             List<Transaction> txn = new List<Transaction>();
-            txn = GlobalDataStorage.Transactions.Where(txn => (txn.SenderAccNum == accNumber || txn.RecieversAccNum == accNumber) && (txn.SendersBankId == bankId || txn.RecieversBankId == bankId)).ToList();
-            return txn;
+            return GlobalDataStorage.Banks.First(bank => bank.BankId == bankId).Transactions.Where(txn => (txn.SenderAccNum == accNumber || txn.RecieversAccNum == accNumber)).ToList();
+            
         }
 
 

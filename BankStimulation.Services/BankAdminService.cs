@@ -8,14 +8,14 @@ namespace BankStimulation.Services
         public string bankId;
         public bool AddEmployees(BankEmployee emp )
         {
-            GlobalDataStorage.BankEmp.Add(emp);
+            GlobalDataStorage.Banks.First(bank  => bank.BankId == emp.BankId).BankEmp.Add(emp);
 
             return true;
         }
 
         public bool EditEmployees(BankEmployee  emp)
         {
-            var empToBeEdited = GlobalDataStorage.BankEmp.FirstOrDefault(employee => employee.UserId== emp.UserId);
+            var empToBeEdited = GlobalDataStorage.Banks.First(bank => bank.BankId == emp.BankId).BankEmp.First(employee => employee.UserId== emp.UserId);
             empToBeEdited.UserName = emp.UserName;
             empToBeEdited.Password = emp.Password;
             return true;
@@ -23,10 +23,10 @@ namespace BankStimulation.Services
 
         public bool ApproveTransaction(string txnNum)
         {
-            var txnToBeApproved = GlobalDataStorage.Transactions.FirstOrDefault(txn => txn.TransectionNum== txnNum);
+            var txnToBeApproved = GlobalDataStorage.Banks.First(bank => bank.BankId == bankId).Transactions.First(txn => txn.TransectionNum== txnNum);
             if(txnToBeApproved.RecieversBankId == bankId)
             {
-                GlobalDataStorage.AccHolder.FirstOrDefault(acc => acc.AccNumber == txnToBeApproved.RecieversAccNum && acc.BankId == bankId).AccountBalance += txnToBeApproved.TransactionAmount;
+                GlobalDataStorage.Banks.First(bank => bank.BankId == bankId).AccHolder.FirstOrDefault(acc => acc.AccNumber == txnToBeApproved.RecieversAccNum && acc.BankId == bankId).AccountBalance += txnToBeApproved.TransactionAmount;
                 txnToBeApproved.TransactionStatus = Enums.TransactionStatus.Success;
             }
             return true;
@@ -34,12 +34,12 @@ namespace BankStimulation.Services
 
         public List<Transaction> GetTransactionsToApprove()
         {
-            return GlobalDataStorage.Transactions.Where(txn => txn.TransactionStatus == Enums.TransactionStatus.Pending && (txn.RecieversBankId == bankId || txn.SendersBankId == bankId)).ToList();
+            return GlobalDataStorage.Banks.First(bank => bank.BankId == bankId).Transactions.Where(txn => txn.TransactionStatus == Enums.TransactionStatus.Pending && (txn.RecieversBankId == bankId || txn.SendersBankId == bankId)).ToList();
         }
 
-        public bool ValidateBankAdmin(string userId , string password)
+        public bool ValidateBankAdmin(string userId , string password , string idBank)
         {
-            var validateCred = GlobalDataStorage.Banks.FirstOrDefault(bank => bank.UserId == userId && bank.Password == password);
+            var validateCred = GlobalDataStorage.Banks.FirstOrDefault(bank => bank.BankId == idBank && bank.Admin.Password == password && bank.Admin.UserId == userId);
             if (validateCred != null)
             {
                 bankId = validateCred.BankId;
@@ -56,9 +56,9 @@ namespace BankStimulation.Services
             return (GetTransactionsToApprove().Any(txn => txn.TransectionNum == transactionNumber));
         }
 
-        public bool ValidateBankAdmin(string userId)
+        public bool ValidateBankAdmin(string userId , string idBank)
         {
-            return GlobalDataStorage.Banks.Any(bank => bank.UserId == userId);
+            return GlobalDataStorage.Banks.Any(bank => bank.Admin.UserId == userId && bank.BankId == idBank);
             
             
         }

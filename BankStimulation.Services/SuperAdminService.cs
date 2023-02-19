@@ -4,8 +4,8 @@ namespace BankStimulation.Services
 {
     public class SuperAdminService
     {
-        string _superAdminId = "SupAdmin";
-        string _superAdminPassword = "Super@123";
+        Users _superAdmin = new Users() { UserId = "superAdminXX", UserName = "Super", Password = "super@123" };
+
         public bool CreateBank(Bank bank)
         {
             GlobalDataStorage.Banks.Add(bank);
@@ -14,10 +14,10 @@ namespace BankStimulation.Services
 
         public bool EditBankAdminCredentials(string bankId , Users admin)
         {
-            var bankToBeEdited = GlobalDataStorage.Banks.FirstOrDefault(bank => bank.BankId== bankId);
-            bankToBeEdited.UserId = admin.UserId;
-            bankToBeEdited.UserName = admin.UserName;
-            bankToBeEdited.Password = admin.Password;
+            var bankToBeEdited = GlobalDataStorage.Banks.First(bank => bank.BankId== bankId);
+            bankToBeEdited.Admin.UserId = admin.UserId;
+            bankToBeEdited.Admin.UserName = admin.UserName;
+            bankToBeEdited.Admin.Password = admin.Password;
             return true;
         }
 
@@ -28,7 +28,7 @@ namespace BankStimulation.Services
 
         public bool ValidateSuperAdmin(string superAdminId , string superAdminPassword)
         {
-            return (superAdminId == _superAdminId) && (superAdminPassword == _superAdminPassword);
+            return (superAdminId == _superAdmin.UserId) && (superAdminPassword == _superAdmin.Password);
         }
 
     }
